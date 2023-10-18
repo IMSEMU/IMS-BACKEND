@@ -11,9 +11,9 @@ import {
   getStudent
 } from '../controllers/student.controller.js';
 
-import { verifyToken } from '../middleware/verifyToken.js';
 import { refreshToken } from '../controllers/RefreshToken.js';
 import { createLogEntry, getEntries } from '../controllers/log.controller.js';
+import { createApplication } from '../controllers/internship.controller.js';
 
 const router = express.Router();
 
@@ -29,9 +29,12 @@ router.get('/viewlog', getEntries);
 //student routes
 router.post('/register', Register);
 router.get('/getstudent', getStudent);
+router.post('/createapp', createApplication);
 
 /* forgot password */
 router.post('/forgotpassword', ForgotPassword);
 router.post('/newPassword/:token', newPassword);
+
+
 
 export default router;

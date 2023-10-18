@@ -51,6 +51,10 @@ const Students = db.define(
       type: DataTypes.BOOLEAN,
       defaultValue: false,
     },
+    workdesc: {
+      type: DataTypes.TEXT,
+      allowNull: true,
+    },
   },
   {
     freezeTableName: true,
