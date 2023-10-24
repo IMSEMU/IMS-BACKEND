@@ -15,7 +15,7 @@ export const getCompanies = async (req, res) => {
       return res.status(401).json({ msg: "Unauthorized" });
     }
 
-    const companies = await Company.findAll({ attributes: ["name"] });
+    const companies = await Company.findAll();
     res.status(200).json(companies);
   } catch (error) {
     console.error(error);
