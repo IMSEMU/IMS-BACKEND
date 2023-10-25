@@ -5,8 +5,10 @@ import CompSup from "../models/compsup.model.js";
 
 export const createApplication = async (req, res) => {
   const {
+    photo,
     stdphoneno,
     stdaddress,
+    compid,
     companyname,
     fields,
     website,
@@ -39,28 +41,42 @@ export const createApplication = async (req, res) => {
         phoneno: stdphoneno,
         address: stdaddress,
         workdesc: workdesc,
+        photo: photo,
         filled_iaf: 1,
       },
       {
         where: { userid: userid },
       }
     );
-    const newCompany = await Company.create({
-      name: companyname,
-      fields: fields,
-      address: compaddress,
-      fax: compfax,
-      phoneno: compphone,
-      email: compemail,
-      website: website,
+    let newCompany;
+    if (compid === "") {
+      newCompany = await Company.create({
+        name: companyname,
+        fields: fields,
+        address: compaddress,
+        fax: compfax,
+        phoneno: compphone,
+        email: compemail,
+        website: website,
+      });
+    } else {
+      newCompany = await Company.findOne({
+        where: { companyid: compid },
+      });
+    }
+
+    const compSupExists = await CompSup.findOne({
+      where: { email: supemail },
     });
-    await CompSup.create({
-      firstname: supfname,
-      lastname: suplname,
-      email: supemail,
-      position: position,
-      companyid: newCompany.companyid,
-    });
+    if (!compSupExists) {
+      await CompSup.create({
+        firstname: supfname,
+        lastname: suplname,
+        email: supemail,
+        position: position,
+        companyid: newCompany.companyid,
+      });
+    }
 
     return res.json({ msg: "Application Successful" });
   } catch (error) {
