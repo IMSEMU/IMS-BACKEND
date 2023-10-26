@@ -80,6 +80,7 @@ export const getStudent = async (req, res) => {
         "isConfirmed",
         "filledSocial",
         "logComplete",
+        "reportComplete",
       ],
     });
     const stdInfo = {

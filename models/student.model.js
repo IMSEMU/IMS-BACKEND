@@ -59,6 +59,11 @@ const Students = db.define(
       defaultValue: false,
       allowNull: false,
     },
+    reportComplete: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+      allowNull: false,
+    },
     workdesc: {
       type: DataTypes.TEXT,
       allowNull: true,
