@@ -39,35 +39,6 @@ const Students = db.define(
     father_name: {
       type: DataTypes.STRING,
     },
-    filled_iaf: {
-      type: DataTypes.BOOLEAN,
-      defaultValue: false,
-      allowNull: false,
-    },
-    isConfirmed: {
-      type: DataTypes.BOOLEAN,
-      defaultValue: false,
-      allowNull: false,
-    },
-    filledSocial: {
-      type: DataTypes.BOOLEAN,
-      defaultValue: false,
-      allowNull: false,
-    },
-    logComplete: {
-      type: DataTypes.BOOLEAN,
-      defaultValue: false,
-      allowNull: false,
-    },
-    reportComplete: {
-      type: DataTypes.BOOLEAN,
-      defaultValue: false,
-      allowNull: false,
-    },
-    workdesc: {
-      type: DataTypes.TEXT,
-      allowNull: true,
-    },
     photo: {
       type: DataTypes.STRING,
       allowNull: true,

@@ -2,6 +2,7 @@ import { verifyToken } from "../middleware/verifyToken.js";
 import Company from "../models/company.model.js";
 import Students from "../models/student.model.js";
 import CompSup from "../models/compsup.model.js";
+import Internshipdtl from "../models/intdetails.model.js";
 
 export const createApplication = async (req, res) => {
   const {
@@ -40,14 +41,13 @@ export const createApplication = async (req, res) => {
       {
         phoneno: stdphoneno,
         address: stdaddress,
-        workdesc: workdesc,
         photo: photo,
-        filled_iaf: 1,
       },
       {
         where: { userid: userid },
       }
     );
+
     let newCompany;
     if (compid === "") {
       newCompany = await Company.create({
@@ -65,11 +65,12 @@ export const createApplication = async (req, res) => {
       });
     }
 
-    const compSupExists = await CompSup.findOne({
+    let compSup;
+    compSup = await CompSup.findOne({
       where: { email: supemail },
     });
-    if (!compSupExists) {
-      await CompSup.create({
+    if (!compSup) {
+      compSup = await CompSup.create({
         firstname: supfname,
         lastname: suplname,
         email: supemail,
@@ -77,6 +78,20 @@ export const createApplication = async (req, res) => {
         companyid: newCompany.companyid,
       });
     }
+    const student = await Students.findOne({
+      where: { userid: userid },
+    });
+    await Internshipdtl.update(
+      {
+        filled_iaf: 1,
+        workdesc: workdesc,
+        companyid: newCompany.companyid,
+        comp_sup: compSup.supid,
+      },
+      {
+        where: { stdid: student.stdid },
+      }
+    );
 
     return res.json({ msg: "Application Successful" });
   } catch (error) {

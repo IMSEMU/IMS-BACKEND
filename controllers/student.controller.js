@@ -2,6 +2,7 @@ import Students from "../models/student.model.js";
 import Users from "../models/user.model.js";
 import bcrypt from "bcrypt";
 import { verifyToken } from "../middleware/verifyToken.js";
+import Internshipdtl from "../models/intdetails.model.js";
 
 export const Register = async (req, res) => {
   const { stdid, firstname, lastname, email, password, confPassword } =
@@ -46,6 +47,9 @@ export const Register = async (req, res) => {
       stdid: stdid,
       userId: newUser.userid,
     });
+    await Internshipdtl.create({
+      stdid: stdid,
+    });
 
     return res.json({ msg: "Registration Successful" });
   } catch (error) {
@@ -67,15 +71,13 @@ export const getStudent = async (req, res) => {
     if (!userid) {
       return res.status(401).json({ msg: "Unauthorized" });
     }
-    const user = await Users.findAll({
+    const std = await Students.findOne({
       where: { userid: userid },
-      attributes: ["userid", "firstname", "lastname", "email"],
+      attributes: ["userId", "stdid", "phoneno", "address"],
     });
-    const student = await Students.findAll({
-      where: { userid: userid },
+    const intdtl = await Internshipdtl.findOne({
+      where: { stdid: std.stdid },
       attributes: [
-        "userId",
-        "stdid",
         "filled_iaf",
         "isConfirmed",
         "filledSocial",
@@ -83,11 +85,43 @@ export const getStudent = async (req, res) => {
         "reportComplete",
       ],
     });
-    const stdInfo = {
-      user,
-      student,
+    const student = {
+      userid: std.userId,
+      stdid: std.stdid,
+      phoneno: std.phoneno,
+      address: std.address,
+      filled_iaf: intdtl.filled_iaf,
+      isConfirmed: intdtl.isConfirmed,
+      filledSocial: intdtl.filledSocial,
+      logComplete: intdtl.logComplete,
+      reportComplete: intdtl.reportComplete,
     };
-    res.status(200).json(stdInfo);
+
+    res.status(200).json(student);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ msg: "Internal server error" });
+  }
+};
+
+export const getPhoto = async (req, res) => {
+  try {
+    // Check if user is logged in
+    const refreshToken = req.cookies.refreshToken;
+    if (!refreshToken) {
+      return res.status(401).json({ msg: "Unauthorized" });
+    }
+
+    // Verify refresh token and get user ID
+    const { userid } = await verifyToken(refreshToken);
+    if (!userid) {
+      return res.status(401).json({ msg: "Unauthorized" });
+    }
+    const student = await Students.findOne({
+      where: { userid: userid },
+      attributes: ["photo"],
+    });
+    res.status(200).json(student.photo);
   } catch (error) {
     console.error(error);
     res.status(500).json({ msg: "Internal server error" });

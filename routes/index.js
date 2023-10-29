@@ -6,12 +6,16 @@ import {
   newPassword,
 } from "../controllers/user.controller.js";
 
-import { Register, getStudent } from "../controllers/student.controller.js";
+import {
+  Register,
+  getPhoto,
+  getStudent,
+} from "../controllers/student.controller.js";
 
 import { refreshToken } from "../controllers/RefreshToken.js";
 import { createLogEntry, getEntries } from "../controllers/log.controller.js";
 import { createApplication } from "../controllers/internship.controller.js";
-import { getCompanies } from "../controllers/company.controller.js";
+import { getCompanies, getCompany } from "../controllers/company.controller.js";
 
 const router = express.Router();
 
@@ -28,9 +32,10 @@ router.get("/viewlog", getEntries);
 router.post("/register", Register);
 router.get("/getstudent", getStudent);
 router.post("/createapp", createApplication);
-
+router.get("/getphoto", getPhoto);
 //company routes
-router.get("/getcomp", getCompanies);
+router.get("/getcomps", getCompanies);
+router.get("/getcomp", getCompany);
 
 /* forgot password */
 router.post("/forgotpassword", ForgotPassword);
