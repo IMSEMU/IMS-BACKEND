@@ -31,7 +31,17 @@ const Internshipdtl = db.define(
       defaultValue: false,
       allowNull: false,
     },
-    isConfirmed: {
+    iafConfirmed: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+      allowNull: false,
+    },
+    filledConForm: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+      allowNull: false,
+    },
+    conFormConfirmed: {
       type: DataTypes.BOOLEAN,
       defaultValue: false,
       allowNull: false,
@@ -41,12 +51,47 @@ const Internshipdtl = db.define(
       defaultValue: false,
       allowNull: false,
     },
+    sifConfirmed: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+      allowNull: false,
+    },
     logComplete: {
       type: DataTypes.BOOLEAN,
       defaultValue: false,
       allowNull: false,
     },
+    logConfirmed: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+      allowNull: false,
+    },
+    compEvalFilled: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+      allowNull: false,
+    },
+    compEvalConfirmed: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+      allowNull: false,
+    },
     reportComplete: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+      allowNull: false,
+    },
+    reportConfirmed: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+      allowNull: false,
+    },
+    deptEvalFilled: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+      allowNull: false,
+    },
+    intComplete: {
       type: DataTypes.BOOLEAN,
       defaultValue: false,
       allowNull: false,

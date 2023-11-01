@@ -1,11 +1,12 @@
-import { Sequelize } from 'sequelize';
-import db from '../config/db.config.js';
-import Company from './company.model.js';
+import { Sequelize } from "sequelize";
+import db from "../config/db.config.js";
+import Company from "./company.model.js";
+import Users from "./user.model.js";
 
 const { DataTypes } = Sequelize;
 
 const CompSup = db.define(
-  'compsup',
+  "compsup",
   {
     supid: {
       type: DataTypes.INTEGER,
@@ -17,9 +18,9 @@ const CompSup = db.define(
       allowNull: false,
     },
     lastname: {
-        type: DataTypes.STRING,
-        allowNull: false,
-      },
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
     email: {
       type: DataTypes.STRING,
       allowNull: false,
@@ -39,8 +40,10 @@ const CompSup = db.define(
 })();
 
 CompSup.belongsTo(Company, {
-  foreignKey: 'companyid'
+  foreignKey: "companyid",
 });
-
+CompSup.belongsTo(Users, {
+  foreignKey: "userid",
+});
 
 export default CompSup;

@@ -99,3 +99,84 @@ export const createApplication = async (req, res) => {
     return res.status(500).json({ msg: "Application Error" });
   }
 };
+
+export const submitInsurance = async (req, res) => {
+  const {
+    idpassno,
+    ayear,
+    dept,
+    faculty,
+    fname,
+    mname,
+    pob,
+    birthDate,
+    issueDate,
+    validity,
+    sgk,
+  } = req.body;
+
+  try {
+    // Check if user is logged in
+    const refreshToken = req.cookies.refreshToken;
+    if (!refreshToken) {
+      return res.status(401).json({ msg: "Unauthorized" });
+    }
+
+    // Verify refresh token and get user ID
+    const { userid } = await verifyToken(refreshToken);
+    if (!userid) {
+      return res.status(401).json({ msg: "Unauthorized" });
+    }
+
+    await Students.update(
+      {
+        id_passno: idpassno,
+        academicYear: ayear,
+        dept: dept,
+        faculty: faculty,
+        placeofBirth: pob,
+        dateofBirth: birthDate,
+        mother_name: mname,
+        father_name: fname,
+        issueDate: issueDate,
+        validity: validity,
+      },
+      {
+        where: { userid: userid },
+      }
+    );
+
+    const student = await Students.findOne({
+      where: { userid: userid },
+    });
+    const intdtl = await Internshipdtl.findOne({
+      where: {
+        stdid: student.stdid,
+        filledSocial: 0,
+      },
+    });
+
+    await Company.update(
+      {
+        sgk: sgk,
+      },
+      {
+        where: { companyid: intdtl.companyid },
+      }
+    );
+
+    await Internshipdtl.update(
+      {
+        filledSocial: 1,
+      },
+      {
+        where: { internshipid: intdtl.internshipid },
+      }
+    );
+
+    return res.json({ msg: "Form filled Successfully" });
+  } catch (error) {
+    console.error(error); // Log the error for debugging purposes
+    return res.status(500).json({ msg: "Error" });
+  }
+};

@@ -79,7 +79,7 @@ export const getStudent = async (req, res) => {
       where: { stdid: std.stdid },
       attributes: [
         "filled_iaf",
-        "isConfirmed",
+        "iafConfirmed",
         "filledSocial",
         "logComplete",
         "reportComplete",
@@ -91,7 +91,7 @@ export const getStudent = async (req, res) => {
       phoneno: std.phoneno,
       address: std.address,
       filled_iaf: intdtl.filled_iaf,
-      isConfirmed: intdtl.isConfirmed,
+      iafConfirmed: intdtl.iafConfirmed,
       filledSocial: intdtl.filledSocial,
       logComplete: intdtl.logComplete,
       reportComplete: intdtl.reportComplete,

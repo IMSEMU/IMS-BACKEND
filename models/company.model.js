@@ -1,11 +1,11 @@
-import { Sequelize } from 'sequelize';
-import db from '../config/db.config.js';
-import Students from './student.model.js';
+import { Sequelize } from "sequelize";
+import db from "../config/db.config.js";
+import Students from "./student.model.js";
 
 const { DataTypes } = Sequelize;
 
 const Company = db.define(
-  'company',
+  "company",
   {
     companyid: {
       type: DataTypes.INTEGER,
@@ -25,29 +25,33 @@ const Company = db.define(
       allowNull: false,
     },
     city: {
-        type: DataTypes.STRING,
-        allowNull: true,
+      type: DataTypes.STRING,
+      allowNull: true,
     },
     country: {
-        type: DataTypes.STRING,
-        allowNull: true,
+      type: DataTypes.STRING,
+      allowNull: true,
     },
     fax: {
-        type: DataTypes.STRING,
-        allowNull: true,
+      type: DataTypes.STRING,
+      allowNull: true,
     },
     phoneno: {
-        type: DataTypes.STRING,
-        allowNull: false,
+      type: DataTypes.STRING,
+      allowNull: false,
     },
     email: {
-        type: DataTypes.STRING,
-        allowNull: false,
+      type: DataTypes.STRING,
+      allowNull: false,
     },
     website: {
       type: DataTypes.STRING,
       allowNull: false,
-  },
+    },
+    sgk: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
   },
   {
     freezeTableName: true,
@@ -57,6 +61,5 @@ const Company = db.define(
 (async () => {
   await db.sync();
 })();
-
 
 export default Company;

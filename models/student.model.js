@@ -23,6 +23,9 @@ const Students = db.define(
     dept: {
       type: DataTypes.STRING,
     },
+    faculty: {
+      type: DataTypes.STRING,
+    },
     placeofBirth: {
       type: DataTypes.STRING,
     },
@@ -32,6 +35,12 @@ const Students = db.define(
     id_passno: {
       type: DataTypes.STRING,
       unique: true,
+    },
+    issueDate: {
+      type: DataTypes.DATE,
+    },
+    validity: {
+      type: DataTypes.STRING,
     },
     mother_name: {
       type: DataTypes.STRING,
