@@ -23,6 +23,7 @@ import {
   confirmApplication,
   getInternship,
   getSubmissions,
+  rejectApplication,
 } from "../controllers/deptsup.controller.js";
 
 const router = express.Router();
@@ -50,6 +51,7 @@ router.get("/getcomp", getCompany);
 router.get("/getsubs", getSubmissions);
 router.get("/getinternship/:stdid/:id", getInternship);
 router.post("/confirmapp", confirmApplication);
+router.post("/rejectapp", rejectApplication);
 
 /* forgot password */
 router.post("/forgotpassword", ForgotPassword);

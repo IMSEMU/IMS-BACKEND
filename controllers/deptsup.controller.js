@@ -227,3 +227,80 @@ export const confirmApplication = async (req, res) => {
     res.status(500).json({ msg: "Internal server error" });
   }
 };
+
+export const rejectApplication = async (req, res) => {
+  const { stdid } = req.body;
+
+  try {
+    // Check if user is logged in
+    const refreshToken = req.cookies.refreshToken;
+    if (!refreshToken) {
+      return res.status(401).json({ msg: "Unauthorized" });
+    }
+
+    // Verify refresh token and get user ID
+    const { userid } = await verifyToken(refreshToken);
+    if (!userid) {
+      return res.status(401).json({ msg: "Unauthorized" });
+    }
+
+    const student = await Students.update(
+      {
+        phoneno: null,
+        address: null,
+        photo: null,
+      },
+      {
+        where: {
+          stdid: stdid,
+        },
+      }
+    );
+    const internship = await Internshipdtl.findOne({
+      where: {
+        stdid: stdid,
+        filled_iaf: true,
+        iafConfirmed: false,
+      },
+    });
+    const otherSupStudents = await Internshipdtl.findAll({
+      where: { comp_sup: internship.comp_sup },
+    });
+    const otherCompStudents = await Internshipdtl.findAll({
+      where: { companyid: internship.companyid },
+    });
+    const updatedInternship = await Internshipdtl.update(
+      {
+        filled_iaf: false,
+        workdesc: null,
+        companyid: null,
+        comp_sup: null,
+      },
+      {
+        where: {
+          stdid: stdid,
+          filled_iaf: true,
+          iafConfirmed: false,
+        },
+      }
+    );
+    if (otherSupStudents.length === 1) {
+      const std = otherSupStudents[0];
+      await CompSup.destroy({
+        where: { supid: std.comp_sup },
+      });
+      if (otherCompStudents.length === 1) {
+        const int = otherCompStudents[0];
+        await Company.destroy({
+          where: { companyid: int.companyid },
+        });
+      }
+    }
+
+    res.status(200).json({ msg: "Internship Rejected" });
+    // res.status(200).json(intdtl);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ msg: "Internal server error" });
+  }
+};
