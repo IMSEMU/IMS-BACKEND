@@ -53,4 +53,12 @@ export class Email {
   async sendPasswordReset() {
     await this.send("passwordReset", "Your password reset token");
   }
+
+  async sendNewCompSup() {
+    await this.send("newCompSup", "Your EMU IMS Account");
+  }
+
+  async sendNewStudentAdded() {
+    await this.send("newStudent", "Your New EMU IMS Student");
+  }
 }

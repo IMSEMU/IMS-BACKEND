@@ -20,6 +20,7 @@ import {
 } from "../controllers/internship.controller.js";
 import { getCompanies, getCompany } from "../controllers/company.controller.js";
 import {
+  confirmApplication,
   getInternship,
   getSubmissions,
 } from "../controllers/deptsup.controller.js";
@@ -48,6 +49,7 @@ router.get("/getcomp", getCompany);
 //deptsup routes
 router.get("/getsubs", getSubmissions);
 router.get("/getinternship/:stdid/:id", getInternship);
+router.post("/confirmapp", confirmApplication);
 
 /* forgot password */
 router.post("/forgotpassword", ForgotPassword);

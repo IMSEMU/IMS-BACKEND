@@ -5,6 +5,9 @@ import Students from "../models/student.model.js";
 import Internshipdtl from "../models/intdetails.model.js";
 import Users from "../models/user.model.js";
 import CompSup from "../models/compsup.model.js";
+import { generateOtp } from "../utils/otp.js";
+import { Email } from "../utils/mail.js";
+import bcrypt from "bcrypt";
 
 export const getSubmissions = async (req, res) => {
   try {
@@ -125,6 +128,99 @@ export const getInternship = async (req, res) => {
     };
 
     res.status(200).json(iaf);
+    // res.status(200).json(intdtl);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ msg: "Internal server error" });
+  }
+};
+
+export const confirmApplication = async (req, res) => {
+  const { stdid } = req.body;
+
+  try {
+    // Check if user is logged in
+    const refreshToken = req.cookies.refreshToken;
+    if (!refreshToken) {
+      return res.status(401).json({ msg: "Unauthorized" });
+    }
+
+    // Verify refresh token and get user ID
+    const { userid } = await verifyToken(refreshToken);
+    if (!userid) {
+      return res.status(401).json({ msg: "Unauthorized" });
+    }
+
+    const student = await Students.findOne({
+      where: {
+        stdid: stdid,
+      },
+    });
+    const internship = await Internshipdtl.findOne({
+      where: {
+        stdid: stdid,
+        filled_iaf: true,
+        iafConfirmed: false,
+      },
+    });
+    const compsup = await CompSup.findOne({
+      where: {
+        supid: internship.comp_sup,
+      },
+    });
+
+    const userExists = await Users.findOne({
+      where: {
+        [Op.or]: [{ userid: compsup.userid }, { email: compsup.email }],
+      },
+    });
+    if (!userExists) {
+      const token = generateOtp();
+      const saltRounds = 10;
+      const salt = await bcrypt.genSalt(saltRounds);
+      const hashPassword = await bcrypt.hash(token, salt);
+
+      const newUser = await Users.create({
+        firstname: compsup.firstname,
+        lastname: compsup.lastname,
+        email: compsup.email,
+        password: hashPassword,
+        roleId: "3",
+      });
+
+      await CompSup.update(
+        {
+          userid: newUser.userid,
+        },
+        {
+          where: {
+            email: newUser.email,
+          },
+        }
+      );
+
+      const url = `http://localhost:3000/new-password?token=${token}`;
+
+      await new Email(newUser.email, url, token).sendNewCompSup();
+    } else {
+      const url = `http://localhost:3000/login`;
+      const token = " ";
+
+      await new Email(compsup.email, url, token).sendNewStudentAdded();
+    }
+
+    await Internshipdtl.update(
+      {
+        iafConfirmed: true,
+      },
+      {
+        where: {
+          internshipid: internship.internshipid,
+        },
+      }
+    );
+
+    res.status(200).json({ msg: "Internship Confirmed" });
     // res.status(200).json(intdtl);
   } catch (error) {
     console.error(error);
