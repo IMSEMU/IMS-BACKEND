@@ -1,9 +1,9 @@
-import nodemailer from 'nodemailer';
-import * as htmlToText from 'html-to-text';
-import pug from 'pug';
+import nodemailer from "nodemailer";
+import * as htmlToText from "html-to-text";
+import pug from "pug";
 
-import path from 'path';
-import { fileURLToPath } from 'url';
+import path from "path";
+import { fileURLToPath } from "url";
 const __filename = fileURLToPath(import.meta.url);
 
 const __dirname = path.dirname(__filename);
@@ -47,11 +47,10 @@ export class Email {
   }
 
   async sendWelcome() {
-    await this.send('welcome', "Welcome to IMS");
+    await this.send("welcome", "Welcome to IMS");
   }
 
   async sendPasswordReset() {
-    await this.send('passwordReset', 'Your password reset token');
+    await this.send("passwordReset", "Your password reset token");
   }
 }
-
