@@ -3,6 +3,7 @@ import Users from "../models/user.model.js";
 import bcrypt from "bcrypt";
 import { verifyToken } from "../middleware/verifyToken.js";
 import Internshipdtl from "../models/intdetails.model.js";
+import Company from "../models/company.model.js";
 
 export const Register = async (req, res) => {
   const { stdid, firstname, lastname, email, password, confPassword } =
@@ -77,23 +78,24 @@ export const getStudent = async (req, res) => {
     });
     const intdtl = await Internshipdtl.findOne({
       where: { stdid: std.stdid },
-      attributes: [
-        "filled_iaf",
-        "iafConfirmed",
-        "filledSocial",
-        "logComplete",
-        "reportComplete",
-      ],
+    });
+    const company = await Company.findOne({
+      where: { companyid: intdtl.companyid },
     });
     const student = {
       userid: std.userId,
       stdid: std.stdid,
       phoneno: std.phoneno,
       address: std.address,
+      country: company.country,
       filled_iaf: intdtl.filled_iaf,
       iafConfirmed: intdtl.iafConfirmed,
+      filledConForm: intdtl.filledConForm,
+      conFormConfirmed: intdtl.conFormConfirmed,
       filledSocial: intdtl.filledSocial,
+      sifConfirmed: intdtl.sifConfirmed,
       logComplete: intdtl.logComplete,
+      logConfirmed: intdtl.logConfirmed,
       reportComplete: intdtl.reportComplete,
     };
 
