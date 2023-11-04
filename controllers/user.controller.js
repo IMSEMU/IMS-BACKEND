@@ -182,6 +182,7 @@ export const newPassword = async (req, res) => {
   if (!user) {
     res.status(400).json({ msg: "Token is invalid or has expired" });
   } else {
+    console.log(user);
     const { password, confPassword } = req.body;
     if (password == "") {
       return res.status(400).json({ msg: "Password cannot be blank" });

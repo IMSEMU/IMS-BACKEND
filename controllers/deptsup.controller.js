@@ -185,6 +185,7 @@ export const confirmApplication = async (req, res) => {
         lastname: compsup.lastname,
         email: compsup.email,
         password: hashPassword,
+        refresh_token: token,
         roleId: "3",
       });
 
