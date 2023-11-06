@@ -25,6 +25,11 @@ import {
   getSubmissions,
   rejectApplication,
 } from "../controllers/deptsup.controller.js";
+import {
+  getStudentCompany,
+  getStudents,
+  submitConForm,
+} from "../controllers/compsup.controller.js";
 
 const router = express.Router();
 
@@ -43,6 +48,7 @@ router.get("/getstudent", getStudent);
 router.post("/createapp", createApplication);
 router.post("/submitins", submitInsurance);
 router.get("/getphoto", getPhoto);
+
 //company routes
 router.get("/getcomps", getCompanies);
 router.get("/getcomp", getCompany);
@@ -52,6 +58,11 @@ router.get("/getsubs", getSubmissions);
 router.get("/getinternship/:stdid/:id", getInternship);
 router.post("/confirmapp", confirmApplication);
 router.post("/rejectapp", rejectApplication);
+
+//compsup routes
+router.get("/getstd", getStudents);
+router.post("/getstdcomp", getStudentCompany);
+router.post("/submitconform", submitConForm);
 
 /* forgot password */
 router.post("/forgotpassword", ForgotPassword);
