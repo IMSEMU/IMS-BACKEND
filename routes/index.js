@@ -21,9 +21,11 @@ import {
 import { getCompanies, getCompany } from "../controllers/company.controller.js";
 import {
   confirmApplication,
+  confirmConfirmation,
   getInternship,
   getSubmissions,
   rejectApplication,
+  rejectConfirmation,
 } from "../controllers/deptsup.controller.js";
 import {
   getStudentCompany,
@@ -58,6 +60,8 @@ router.get("/getsubs", getSubmissions);
 router.get("/getinternship/:stdid/:id", getInternship);
 router.post("/confirmapp", confirmApplication);
 router.post("/rejectapp", rejectApplication);
+router.post("/confirmcon", confirmConfirmation);
+router.post("/rejectcon", rejectConfirmation);
 
 //compsup routes
 router.get("/getstd", getStudents);

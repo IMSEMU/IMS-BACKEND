@@ -1,5 +1,5 @@
 import { verifyToken } from "../middleware/verifyToken.js";
-import { Op } from "sequelize";
+import { Op, Sequelize } from "sequelize";
 import Company from "../models/company.model.js";
 import Students from "../models/student.model.js";
 import Internshipdtl from "../models/intdetails.model.js";
@@ -8,6 +8,8 @@ import CompSup from "../models/compsup.model.js";
 import { generateOtp } from "../utils/otp.js";
 import { Email } from "../utils/mail.js";
 import bcrypt from "bcrypt";
+import db from "../config/db.config.js";
+import IntWork from "../models/intwork.model.js";
 
 export const getSubmissions = async (req, res) => {
   try {
@@ -91,6 +93,20 @@ export const getInternship = async (req, res) => {
         internshipid: id,
       },
     });
+
+    const intwork = await db.query(
+      "SELECT intworkid, intdetailInternshipid, workdone.work, other " +
+        "FROM intwork " +
+        "LEFT JOIN workdone ON workdone.workId = intwork.workdoneWorkid " +
+        "WHERE intdetailInternshipid = :id",
+      {
+        replacements: {
+          id: `${id}`,
+        },
+        type: db.QueryTypes.SELECT,
+      }
+    );
+
     const std = await Users.findOne({
       where: {
         userid: student.userId,
@@ -120,11 +136,17 @@ export const getInternship = async (req, res) => {
       compphone: company.phoneno,
       compaddress: company.address,
       compfax: company.fax,
+      city: company.city,
+      country: company.country,
       workdesc: internship.workdesc,
       supfname: compsup.firstname,
       suplname: compsup.lastname,
       supemail: compsup.email,
       position: compsup.position,
+      startdate: internship.startDate,
+      enddate: internship.endDate,
+      duration: internship.workingDays,
+      intwork: intwork,
     };
 
     res.status(200).json(iaf);
@@ -297,6 +319,101 @@ export const rejectApplication = async (req, res) => {
         });
       }
     }
+
+    res.status(200).json({ msg: "Internship Rejected" });
+    // res.status(200).json(intdtl);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ msg: "Internal server error" });
+  }
+};
+
+export const confirmConfirmation = async (req, res) => {
+  const { stdid } = req.body;
+
+  try {
+    // Check if user is logged in
+    const refreshToken = req.cookies.refreshToken;
+    if (!refreshToken) {
+      return res.status(401).json({ msg: "Unauthorized" });
+    }
+
+    // Verify refresh token and get user ID
+    const { userid } = await verifyToken(refreshToken);
+    if (!userid) {
+      return res.status(401).json({ msg: "Unauthorized" });
+    }
+
+    const student = await Students.findOne({
+      where: {
+        stdid: stdid,
+      },
+    });
+    const internship = await Internshipdtl.findOne({
+      where: {
+        stdid: stdid,
+        filledConForm: true,
+        conFormConfirmed: false,
+      },
+    });
+
+    await Internshipdtl.update(
+      {
+        conFormConfirmed: true,
+      },
+      {
+        where: {
+          internshipid: internship.internshipid,
+        },
+      }
+    );
+
+    res.status(200).json({ msg: "Internship Confirmed" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ msg: "Internal server error" });
+  }
+};
+
+export const rejectConfirmation = async (req, res) => {
+  const { stdid } = req.body;
+
+  try {
+    // Check if user is logged in
+    const refreshToken = req.cookies.refreshToken;
+    if (!refreshToken) {
+      return res.status(401).json({ msg: "Unauthorized" });
+    }
+
+    // Verify refresh token and get user ID
+    const { userid } = await verifyToken(refreshToken);
+    if (!userid) {
+      return res.status(401).json({ msg: "Unauthorized" });
+    }
+
+    const internship = await Internshipdtl.findOne({
+      where: {
+        stdid: stdid,
+        filledConForm: true,
+        conFormConfirmed: false,
+      },
+    });
+    await Internshipdtl.update(
+      {
+        startDate: null,
+        endDate: null,
+        workingDays: null,
+        filledConForm: false,
+      },
+      {
+        where: { internshipid: internship.internshipid },
+      }
+    );
+    IntWork.destroy({
+      where: {
+        intdetailInternshipid: internship.internshipid,
+      },
+    });
 
     res.status(200).json({ msg: "Internship Rejected" });
     // res.status(200).json(intdtl);
