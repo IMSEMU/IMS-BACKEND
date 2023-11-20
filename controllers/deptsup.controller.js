@@ -124,11 +124,22 @@ export const getInternship = async (req, res) => {
     });
     const iaf = {
       photo: student.photo,
+      stdid: student.stdid,
       stdfname: std.firstname,
       stdlname: std.lastname,
       stdemail: std.email,
       stdphone: student.phoneno,
       stdaddress: student.address,
+      idpassno: student.id_passno,
+      ayear: student.academicYear,
+      dept: student.dept,
+      fname: student.father_name,
+      mname: student.mother_name,
+      pob: student.placeofBirth,
+      dob: student.dateofBirth,
+      doi: student.issueDate,
+      validity: student.validity,
+      faculty: student.faculty,
       compname: company.name,
       fields: company.fields,
       website: company.website,
@@ -138,6 +149,7 @@ export const getInternship = async (req, res) => {
       compfax: company.fax,
       city: company.city,
       country: company.country,
+      sgk: company.sgk,
       workdesc: internship.workdesc,
       supfname: compsup.firstname,
       suplname: compsup.lastname,
@@ -417,6 +429,53 @@ export const rejectConfirmation = async (req, res) => {
 
     res.status(200).json({ msg: "Internship Rejected" });
     // res.status(200).json(intdtl);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ msg: "Internal server error" });
+  }
+};
+
+export const confirmInsurance = async (req, res) => {
+  const { stdid } = req.body;
+
+  try {
+    // Check if user is logged in
+    const refreshToken = req.cookies.refreshToken;
+    if (!refreshToken) {
+      return res.status(401).json({ msg: "Unauthorized" });
+    }
+
+    // Verify refresh token and get user ID
+    const { userid } = await verifyToken(refreshToken);
+    if (!userid) {
+      return res.status(401).json({ msg: "Unauthorized" });
+    }
+
+    const student = await Students.findOne({
+      where: {
+        stdid: stdid,
+      },
+    });
+    const internship = await Internshipdtl.findOne({
+      where: {
+        stdid: stdid,
+        filledSocial: true,
+        sifConfirmed: false,
+      },
+    });
+
+    await Internshipdtl.update(
+      {
+        sifConfirmed: true,
+      },
+      {
+        where: {
+          internshipid: internship.internshipid,
+        },
+      }
+    );
+
+    res.status(200).json({ msg: "Social Insurance Confirmed" });
   } catch (error) {
     console.error(error);
     res.status(500).json({ msg: "Internal server error" });
