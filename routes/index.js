@@ -31,6 +31,7 @@ import {
 import {
   getStudentCompany,
   getStudents,
+  saveConForm,
   submitConForm,
 } from "../controllers/compsup.controller.js";
 
@@ -69,6 +70,7 @@ router.post("/confirmins", confirmInsurance);
 router.get("/getstd", getStudents);
 router.post("/getstdcomp", getStudentCompany);
 router.post("/submitconform", submitConForm);
+router.post("/saveconform", saveConForm);
 
 /* forgot password */
 router.post("/forgotpassword", ForgotPassword);

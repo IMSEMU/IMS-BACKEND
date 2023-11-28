@@ -100,6 +100,10 @@ const Internshipdtl = db.define(
       type: DataTypes.TEXT,
       allowNull: true,
     },
+    conForm: {
+      type: DataTypes.TEXT,
+      allowNull: true,
+    },
   },
   {
     freezeTableName: true,

@@ -8,6 +8,7 @@ import CompSup from "../models/compsup.model.js";
 import { generateOtp } from "../utils/otp.js";
 import { Email } from "../utils/mail.js";
 import WorkDone from "../models/workdone.model.js";
+import Users from "../models/user.model.js";
 
 export const getStudents = async (req, res) => {
   try {
@@ -58,11 +59,16 @@ export const getStudentCompany = async (req, res) => {
     const std = await Students.findOne({
       where: { stdid: stdid },
     });
+    const student = await Users.findOne({
+      attributes: ["firstname", "lastname"],
+      where: { userid: std.userId },
+    });
 
     const intdtl = await Internshipdtl.findOne({
       where: {
         stdid: stdid,
         iafConfirmed: true,
+        filledConForm: false,
       },
     });
 
@@ -72,7 +78,12 @@ export const getStudentCompany = async (req, res) => {
       },
     });
 
-    res.status(200).json(company);
+    const info = {
+      student: student,
+      company: company,
+    };
+
+    res.status(200).json(info);
   } catch (error) {
     console.error(error);
     res.status(500).json({ msg: "Internal server error" });
@@ -107,7 +118,6 @@ export const submitConForm = async (req, res) => {
         startDate: startDate,
         endDate: endDate,
         workingDays: duration,
-        filledConForm: true,
       },
       {
         where: { internshipid: internship.internshipid },
@@ -127,6 +137,46 @@ export const submitConForm = async (req, res) => {
         other: other,
       });
     }
+
+    res.status(200).json({ msg: "Confirmation Successful" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ msg: "Internal server error" });
+  }
+};
+
+export const saveConForm = async (req, res) => {
+  const { stdid, docSrc } = req.body;
+  try {
+    // Check if user is logged in
+    const refreshToken = req.cookies.refreshToken;
+    if (!refreshToken) {
+      return res.status(401).json({ msg: "Unauthorized" });
+    }
+
+    // Verify refresh token and get user ID
+    const { userid } = await verifyToken(refreshToken);
+    if (!userid) {
+      return res.status(401).json({ msg: "Unauthorized" });
+    }
+
+    const internship = await Internshipdtl.findOne({
+      where: {
+        stdid: stdid,
+        filledConForm: false,
+        iafConfirmed: true,
+      },
+    });
+
+    await Internshipdtl.update(
+      {
+        filledConForm: true,
+        conForm: docSrc,
+      },
+      {
+        where: { internshipid: internship.internshipid },
+      }
+    );
 
     res.status(200).json({ msg: "Confirmation Successful" });
   } catch (error) {
