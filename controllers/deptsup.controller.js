@@ -10,6 +10,8 @@ import { Email } from "../utils/mail.js";
 import bcrypt from "bcrypt";
 import db from "../config/db.config.js";
 import IntWork from "../models/intwork.model.js";
+import Notifications from "../models/notification.model.js";
+import DeptSup from "../models/deptsup.model.js";
 
 export const getSubmissions = async (req, res) => {
   try {
@@ -24,6 +26,10 @@ export const getSubmissions = async (req, res) => {
     if (!userid) {
       return res.status(401).json({ msg: "Unauthorized" });
     }
+
+    const deptsup = await DeptSup.findOne({
+      where: { userid: userid },
+    });
 
     const intdtl = await Internshipdtl.findAll({
       where: {
@@ -57,6 +63,7 @@ export const getSubmissions = async (req, res) => {
             reportConfirmed: false,
           },
         ],
+        dept_sup: deptsup.supid,
       },
     });
     res.status(200).json(intdtl);
@@ -82,6 +89,10 @@ export const getInternship = async (req, res) => {
       return res.status(401).json({ msg: "Unauthorized" });
     }
 
+    const deptsup = await DeptSup.findOne({
+      where: { userid: userid },
+    });
+
     const student = await Students.findOne({
       where: {
         stdid: stdid,
@@ -91,6 +102,7 @@ export const getInternship = async (req, res) => {
       where: {
         stdid: stdid,
         internshipid: id,
+        dept_sup: deptsup.supid,
       },
     });
 
@@ -158,11 +170,11 @@ export const getInternship = async (req, res) => {
       startdate: internship.startDate,
       enddate: internship.endDate,
       duration: internship.workingDays,
+      docsrc: internship.conForm,
       intwork: intwork,
     };
 
     res.status(200).json(iaf);
-    // res.status(200).json(intdtl);
   } catch (error) {
     console.error(error);
     res.status(500).json({ msg: "Internal server error" });
@@ -185,16 +197,22 @@ export const confirmApplication = async (req, res) => {
       return res.status(401).json({ msg: "Unauthorized" });
     }
 
+    const deptsup = await DeptSup.findOne({
+      where: { userid: userid },
+    });
+
     const student = await Students.findOne({
       where: {
         stdid: stdid,
       },
     });
+
     const internship = await Internshipdtl.findOne({
       where: {
         stdid: stdid,
         filled_iaf: true,
         iafConfirmed: false,
+        dept_sup: deptsup.supid,
       },
     });
     const compsup = await CompSup.findOne({
@@ -255,6 +273,12 @@ export const confirmApplication = async (req, res) => {
       }
     );
 
+    const notification = await Notifications.create({
+      trigger: "Application Confirmed",
+      message: "Your Internship Application was Confirmed!",
+      userid: student.userId,
+    });
+
     res.status(200).json({ msg: "Internship Confirmed" });
     // res.status(200).json(intdtl);
   } catch (error) {
@@ -279,6 +303,10 @@ export const rejectApplication = async (req, res) => {
       return res.status(401).json({ msg: "Unauthorized" });
     }
 
+    const deptsup = await DeptSup.findOne({
+      where: { userid: userid },
+    });
+
     const student = await Students.update(
       {
         phoneno: null,
@@ -296,6 +324,7 @@ export const rejectApplication = async (req, res) => {
         stdid: stdid,
         filled_iaf: true,
         iafConfirmed: false,
+        dept_sup: deptsup.supid,
       },
     });
     const otherSupStudents = await Internshipdtl.findAll({
@@ -332,6 +361,12 @@ export const rejectApplication = async (req, res) => {
       }
     }
 
+    const notification = await Notifications.create({
+      trigger: "Application Rejected",
+      message: "Your Internship Application was Rejected!",
+      userid: student.userId,
+    });
+
     res.status(200).json({ msg: "Internship Rejected" });
     // res.status(200).json(intdtl);
   } catch (error) {
@@ -356,6 +391,10 @@ export const confirmConfirmation = async (req, res) => {
       return res.status(401).json({ msg: "Unauthorized" });
     }
 
+    const deptsup = await DeptSup.findOne({
+      where: { userid: userid },
+    });
+
     const student = await Students.findOne({
       where: {
         stdid: stdid,
@@ -366,6 +405,7 @@ export const confirmConfirmation = async (req, res) => {
         stdid: stdid,
         filledConForm: true,
         conFormConfirmed: false,
+        dept_sup: deptsup.supid,
       },
     });
 
@@ -379,6 +419,22 @@ export const confirmConfirmation = async (req, res) => {
         },
       }
     );
+
+    const compsup = await CompSup.findOne({
+      where: { supid: internship.comp_sup },
+    });
+
+    const notification = await Notifications.create({
+      trigger: "Confirmation Confirmed",
+      message: "Your Internship Confirmation was Confirmed!",
+      userid: student.userId,
+    });
+
+    const notification2 = await Notifications.create({
+      trigger: "Confirmation Confirmed",
+      message: `Your Internship Confirmation for ${stdid} was Confirmed!`,
+      userid: compsup.userid,
+    });
 
     res.status(200).json({ msg: "Internship Confirmed" });
   } catch (error) {
@@ -403,13 +459,29 @@ export const rejectConfirmation = async (req, res) => {
       return res.status(401).json({ msg: "Unauthorized" });
     }
 
+    const deptsup = await DeptSup.findOne({
+      where: { userid: userid },
+    });
+
+    const student = await Students.findOne({
+      where: {
+        stdid: stdid,
+      },
+    });
+
     const internship = await Internshipdtl.findOne({
       where: {
         stdid: stdid,
         filledConForm: true,
         conFormConfirmed: false,
+        dept_sup: deptsup.supid,
       },
     });
+
+    const compsup = await CompSup.findOne({
+      where: { supid: internship.compsup },
+    });
+
     await Internshipdtl.update(
       {
         startDate: null,
@@ -425,6 +497,18 @@ export const rejectConfirmation = async (req, res) => {
       where: {
         intdetailInternshipid: internship.internshipid,
       },
+    });
+
+    const notification = await Notifications.create({
+      trigger: "Confirmation Rejected",
+      message: "Your Internship Confirmation was Rejected!",
+      userid: student.userId,
+    });
+
+    const notification2 = await Notifications.create({
+      trigger: "Confirmation Confirmed",
+      message: "Your Internship Confirmation was Confirmed!",
+      userid: compsup.userid,
     });
 
     res.status(200).json({ msg: "Internship Rejected" });
@@ -451,6 +535,10 @@ export const confirmInsurance = async (req, res) => {
       return res.status(401).json({ msg: "Unauthorized" });
     }
 
+    const deptsup = await DeptSup.findOne({
+      where: { userid: userid },
+    });
+
     const student = await Students.findOne({
       where: {
         stdid: stdid,
@@ -461,6 +549,7 @@ export const confirmInsurance = async (req, res) => {
         stdid: stdid,
         filledSocial: true,
         sifConfirmed: false,
+        dept_sup: deptsup.supid,
       },
     });
 
@@ -474,6 +563,12 @@ export const confirmInsurance = async (req, res) => {
         },
       }
     );
+
+    const notification = await Notifications.create({
+      trigger: "Isurance Confirmed",
+      message: "Your Social Insurance Form was Confirmed!",
+      userid: student.userId,
+    });
 
     res.status(200).json({ msg: "Social Insurance Confirmed" });
   } catch (error) {

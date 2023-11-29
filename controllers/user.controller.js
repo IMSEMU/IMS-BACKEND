@@ -4,6 +4,8 @@ import { generateOtp } from "../utils/otp.js";
 import { Email } from "../utils/mail.js";
 import { Sequelize, where } from "sequelize";
 import bcrypt from "bcrypt";
+import Notifications from "../models/notification.model.js";
+import { verifyToken } from "../middleware/verifyToken.js";
 
 export const getUsers = async (req, res) => {
   try {
@@ -203,5 +205,33 @@ export const newPassword = async (req, res) => {
       );
       res.status(200).json({ msg: "Password Changed" });
     }
+  }
+};
+
+export const getNotifications = async (req, res) => {
+  try {
+    // Check if user is logged in
+    const refreshToken = req.cookies.refreshToken;
+    if (!refreshToken) {
+      return res.status(401).json({ msg: "Unauthorized" });
+    }
+
+    // Verify refresh token and get user ID
+    const { userid } = await verifyToken(refreshToken);
+    if (!userid) {
+      return res.status(401).json({ msg: "Unauthorized" });
+    }
+
+    const notifications = await Notifications.findAll({
+      where: {
+        userid: userid,
+      },
+      order: [["notifdate", "DESC"]],
+    });
+
+    res.status(200).json(notifications);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ msg: "Internal server error" });
   }
 };

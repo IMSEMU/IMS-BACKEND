@@ -4,6 +4,7 @@ import {
   Logout,
   ForgotPassword,
   newPassword,
+  getNotifications,
 } from "../controllers/user.controller.js";
 
 import {
@@ -41,6 +42,7 @@ const router = express.Router();
 router.post("/login", Login);
 router.get("/token", refreshToken);
 router.delete("/logout", Logout);
+router.get("/getnotifs", getNotifications);
 
 // Logbook
 router.post("/createlog", createLogEntry);

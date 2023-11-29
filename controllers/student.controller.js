@@ -50,6 +50,7 @@ export const Register = async (req, res) => {
     });
     await Internshipdtl.create({
       stdid: stdid,
+      dept_sup: "1",
     });
 
     return res.json({ msg: "Registration Successful" });

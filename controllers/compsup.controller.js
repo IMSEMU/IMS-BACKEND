@@ -5,10 +5,8 @@ import Students from "../models/student.model.js";
 import Internshipdtl from "../models/intdetails.model.js";
 import IntWork from "../models/intwork.model.js";
 import CompSup from "../models/compsup.model.js";
-import { generateOtp } from "../utils/otp.js";
-import { Email } from "../utils/mail.js";
-import WorkDone from "../models/workdone.model.js";
 import Users from "../models/user.model.js";
+import Notifications from "../models/notification.model.js";
 
 export const getStudents = async (req, res) => {
   try {
@@ -160,6 +158,12 @@ export const saveConForm = async (req, res) => {
       return res.status(401).json({ msg: "Unauthorized" });
     }
 
+    const student = await Students.findOne({
+      where: {
+        stdid: stdid,
+      },
+    });
+
     const internship = await Internshipdtl.findOne({
       where: {
         stdid: stdid,
@@ -177,6 +181,13 @@ export const saveConForm = async (req, res) => {
         where: { internshipid: internship.internshipid },
       }
     );
+
+    const notification = await Notifications.create({
+      trigger: "Confirmation Submitted",
+      message:
+        "Your Internship Confirmation was submitted and is awaiting approval.",
+      userid: student.userId,
+    });
 
     res.status(200).json({ msg: "Confirmation Successful" });
   } catch (error) {
