@@ -1,11 +1,11 @@
-import { Sequelize } from 'sequelize';
-import db from '../config/db.config.js';
-import Users from './user.model.js';
+import { Sequelize } from "sequelize";
+import db from "../config/db.config.js";
+import Internshipdtl from "./intdetails.model.js";
 
 const { DataTypes } = Sequelize;
 
 const Log = db.define(
-  'log',
+  "log",
   {
     logid: {
       type: DataTypes.INTEGER,
@@ -13,7 +13,7 @@ const Log = db.define(
       primaryKey: true,
     },
     day: {
-        type: DataTypes.INTEGER,
+      type: DataTypes.INTEGER,
       allowNull: false,
     },
     date: {
@@ -38,9 +38,8 @@ const Log = db.define(
   await db.sync();
 })();
 
-Log.belongsTo(Users, {
-  foreignKey: 'userid',
+Log.belongsTo(Internshipdtl, {
+  foreignKey: "internshipid",
 });
-
 
 export default Log;

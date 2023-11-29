@@ -14,7 +14,11 @@ import {
 } from "../controllers/student.controller.js";
 
 import { refreshToken } from "../controllers/RefreshToken.js";
-import { createLogEntry, getEntries } from "../controllers/log.controller.js";
+import {
+  createLogEntry,
+  getEntries,
+  submitLogbook,
+} from "../controllers/log.controller.js";
 import {
   createApplication,
   submitInsurance,
@@ -47,6 +51,7 @@ router.get("/getnotifs", getNotifications);
 // Logbook
 router.post("/createlog", createLogEntry);
 router.get("/viewlog", getEntries);
+router.post("/submitlog", submitLogbook);
 
 //student routes
 router.post("/register", Register);
