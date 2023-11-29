@@ -40,6 +40,7 @@ import {
   getStudents,
   rejectLogbook,
   saveConForm,
+  submitCompEval,
   submitConForm,
 } from "../controllers/compsup.controller.js";
 
@@ -84,6 +85,7 @@ router.post("/saveconform", saveConForm);
 router.post("/viewsubmittedlog", getLogbook);
 router.post("/approvelog", approveLogbook);
 router.post("/rejectlog", rejectLogbook);
+router.post("/submitcompeval", submitCompEval);
 
 /* forgot password */
 router.post("/forgotpassword", ForgotPassword);

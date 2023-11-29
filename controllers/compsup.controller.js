@@ -8,6 +8,7 @@ import CompSup from "../models/compsup.model.js";
 import Users from "../models/user.model.js";
 import Notifications from "../models/notification.model.js";
 import Log from "../models/log.model.js";
+import CompEval from "../models/compeval.model.js";
 
 export const getStudents = async (req, res) => {
   try {
@@ -344,6 +345,76 @@ export const rejectLogbook = async (req, res) => {
 
     res.status(200).json({ msg: "Internship Rejected" });
     // res.status(200).json(intdtl);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ msg: "Internal server error" });
+  }
+};
+
+export const submitCompEval = async (req, res) => {
+  const {
+    stdid,
+    interest,
+    attendance,
+    technicalAbility,
+    generalBehavior,
+    overallEvaluation,
+    summary,
+    generalComments,
+  } = req.body;
+  try {
+    console.log(generalBehavior);
+    // Check if user is logged in
+    const refreshToken = req.cookies.refreshToken;
+    if (!refreshToken) {
+      return res.status(401).json({ msg: "Unauthorized" });
+    }
+
+    // Verify refresh token and get user ID
+    const { userid } = await verifyToken(refreshToken);
+    if (!userid) {
+      return res.status(401).json({ msg: "Unauthorized" });
+    }
+
+    const compsup = await CompSup.findOne({
+      where: {
+        userid: userid,
+      },
+    });
+
+    const student = await Students.findOne({
+      where: { stdid: stdid },
+    });
+
+    const internship = await Internshipdtl.findOne({
+      where: {
+        compEvalFilled: false,
+        stdid: stdid,
+        comp_sup: compsup.supid,
+      },
+    });
+
+    await CompEval.create({
+      interest: interest,
+      attendance: attendance,
+      technicalablilty: technicalAbility,
+      generalbehaviour: generalBehavior,
+      overalleval: overallEvaluation,
+      summary: summary,
+      generalcomments: generalComments,
+      internshipid: internship.internshipid,
+    });
+
+    await Internshipdtl.update(
+      {
+        compEvalFilled: true,
+      },
+      {
+        where: { internshipid: internship.internshipid },
+      }
+    );
+
+    res.status(200).json({ msg: "Evaluation Successful" });
   } catch (error) {
     console.error(error);
     res.status(500).json({ msg: "Internal server error" });
