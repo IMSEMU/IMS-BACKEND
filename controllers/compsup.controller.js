@@ -7,6 +7,7 @@ import IntWork from "../models/intwork.model.js";
 import CompSup from "../models/compsup.model.js";
 import Users from "../models/user.model.js";
 import Notifications from "../models/notification.model.js";
+import Log from "../models/log.model.js";
 
 export const getStudents = async (req, res) => {
   try {
@@ -190,6 +191,159 @@ export const saveConForm = async (req, res) => {
     });
 
     res.status(200).json({ msg: "Confirmation Successful" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ msg: "Internal server error" });
+  }
+};
+
+export const getLogbook = async (req, res) => {
+  const { stdid } = req.body;
+  try {
+    // Check if user is logged in
+    const refreshToken = req.cookies.refreshToken;
+    if (!refreshToken) {
+      return res.status(401).json({ msg: "Unauthorized" });
+    }
+
+    // Verify refresh token and get user ID
+    const { userid } = await verifyToken(refreshToken);
+    if (!userid) {
+      return res.status(401).json({ msg: "Unauthorized" });
+    }
+
+    const compsup = await CompSup.findOne({
+      where: {
+        userid: userid,
+      },
+    });
+
+    const internship = await Internshipdtl.findOne({
+      where: {
+        logComplete: true,
+        stdid: stdid,
+        comp_sup: compsup.supid,
+      },
+    });
+
+    const logbookEntries = await Log.findAll({
+      where: { internshipid: internship.internshipid },
+    });
+    res.status(200).json(logbookEntries);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ msg: "Internal server error" });
+  }
+};
+
+export const approveLogbook = async (req, res) => {
+  const { stdid } = req.body;
+
+  try {
+    // Check if user is logged in
+    const refreshToken = req.cookies.refreshToken;
+    if (!refreshToken) {
+      return res.status(401).json({ msg: "Unauthorized" });
+    }
+
+    // Verify refresh token and get user ID
+    const { userid } = await verifyToken(refreshToken);
+    if (!userid) {
+      return res.status(401).json({ msg: "Unauthorized" });
+    }
+
+    const compsup = await CompSup.findOne({
+      where: {
+        userid: userid,
+      },
+    });
+
+    const student = await Students.findOne({
+      where: { stdid: stdid },
+    });
+
+    const internship = await Internshipdtl.findOne({
+      where: {
+        logComplete: true,
+        stdid: stdid,
+        comp_sup: compsup.supid,
+      },
+    });
+
+    await Internshipdtl.update(
+      {
+        logConfirmed: true,
+      },
+      {
+        where: { internshipid: internship.internshipid },
+      }
+    );
+
+    const notification = await Notifications.create({
+      trigger: "Logbook Approved",
+      message: "Your Logbook was approved!",
+      userid: student.userId,
+    });
+
+    res.status(200).json({ msg: "Logbook Approved" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ msg: "Internal server error" });
+  }
+};
+
+export const rejectLogbook = async (req, res) => {
+  const { stdid } = req.body;
+
+  try {
+    // Check if user is logged in
+    const refreshToken = req.cookies.refreshToken;
+    if (!refreshToken) {
+      return res.status(401).json({ msg: "Unauthorized" });
+    }
+
+    // Verify refresh token and get user ID
+    const { userid } = await verifyToken(refreshToken);
+    if (!userid) {
+      return res.status(401).json({ msg: "Unauthorized" });
+    }
+
+    const compsup = await CompSup.findOne({
+      where: {
+        userid: userid,
+      },
+    });
+
+    const student = await Students.findOne({
+      where: { stdid: stdid },
+    });
+
+    const internship = await Internshipdtl.findOne({
+      where: {
+        logComplete: true,
+        stdid: stdid,
+        comp_sup: compsup.supid,
+      },
+    });
+
+    await Internshipdtl.update(
+      {
+        logComplete: false,
+      },
+      {
+        where: { internshipid: internship.internshipid },
+      }
+    );
+
+    const notification = await Notifications.create({
+      trigger: "Logbook Rejected",
+      message:
+        "Your Logbook was rejected! Correct it and submit again for approval.",
+      userid: student.userId,
+    });
+
+    res.status(200).json({ msg: "Internship Rejected" });
+    // res.status(200).json(intdtl);
   } catch (error) {
     console.error(error);
     res.status(500).json({ msg: "Internal server error" });

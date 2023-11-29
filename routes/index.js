@@ -34,8 +34,11 @@ import {
   rejectConfirmation,
 } from "../controllers/deptsup.controller.js";
 import {
+  approveLogbook,
+  getLogbook,
   getStudentCompany,
   getStudents,
+  rejectLogbook,
   saveConForm,
   submitConForm,
 } from "../controllers/compsup.controller.js";
@@ -78,6 +81,9 @@ router.get("/getstd", getStudents);
 router.post("/getstdcomp", getStudentCompany);
 router.post("/submitconform", submitConForm);
 router.post("/saveconform", saveConForm);
+router.post("/viewsubmittedlog", getLogbook);
+router.post("/approvelog", approveLogbook);
+router.post("/rejectlog", rejectLogbook);
 
 /* forgot password */
 router.post("/forgotpassword", ForgotPassword);
