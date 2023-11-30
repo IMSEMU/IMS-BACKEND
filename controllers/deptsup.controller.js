@@ -172,6 +172,13 @@ export const getInternship = async (req, res) => {
       enddate: internship.endDate,
       duration: internship.workingDays,
       docsrc: internship.conForm,
+      interest: internship.interest,
+      attendance: internship.attendance,
+      technicalablilty: internship.technicalablilty,
+      generalbehaviour: internship.generalbehaviour,
+      overalleval: internship.overalleval,
+      summary: internship.summary,
+      generalcomments: internship.generalcomments,
       intwork: intwork,
     };
 
@@ -507,8 +514,8 @@ export const rejectConfirmation = async (req, res) => {
     });
 
     const notification2 = await Notifications.create({
-      trigger: "Confirmation Confirmed",
-      message: "Your Internship Confirmation was Confirmed!",
+      trigger: "Confirmation Rejected",
+      message: `Your Internship Confirmation for ${stdid} was Rejected! Please fill it again.`,
       userid: compsup.userid,
     });
 
@@ -611,6 +618,146 @@ export const getDeptLogbook = async (req, res) => {
       where: { internshipid: internship.internshipid },
     });
     res.status(200).json(logbookEntries);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ msg: "Internal server error" });
+  }
+};
+
+export const confirmEvaluation = async (req, res) => {
+  const { stdid } = req.body;
+
+  try {
+    // Check if user is logged in
+    const refreshToken = req.cookies.refreshToken;
+    if (!refreshToken) {
+      return res.status(401).json({ msg: "Unauthorized" });
+    }
+
+    // Verify refresh token and get user ID
+    const { userid } = await verifyToken(refreshToken);
+    if (!userid) {
+      return res.status(401).json({ msg: "Unauthorized" });
+    }
+
+    const deptsup = await DeptSup.findOne({
+      where: { userid: userid },
+    });
+
+    const student = await Students.findOne({
+      where: {
+        stdid: stdid,
+      },
+    });
+    const internship = await Internshipdtl.findOne({
+      where: {
+        stdid: stdid,
+        compEvalFilled: true,
+        compEvalConfirmed: false,
+        dept_sup: deptsup.supid,
+      },
+    });
+
+    await Internshipdtl.update(
+      {
+        compEvalConfirmed: true,
+      },
+      {
+        where: {
+          internshipid: internship.internshipid,
+        },
+      }
+    );
+
+    const compsup = await CompSup.findOne({
+      where: { supid: internship.comp_sup },
+    });
+
+    const notification = await Notifications.create({
+      trigger: "Evaluation Confirmed",
+      message: "Your Trainee Evaluation was Confirmed!",
+      userid: student.userId,
+    });
+
+    const notification2 = await Notifications.create({
+      trigger: "Evaluation Confirmed",
+      message: `Your Trainee Evaluation for ${stdid} was Confirmed!`,
+      userid: compsup.userid,
+    });
+
+    res.status(200).json({ msg: "Internship Confirmed" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ msg: "Internal server error" });
+  }
+};
+
+export const rejectEvaluation = async (req, res) => {
+  const { stdid } = req.body;
+
+  try {
+    // Check if user is logged in
+    const refreshToken = req.cookies.refreshToken;
+    if (!refreshToken) {
+      return res.status(401).json({ msg: "Unauthorized" });
+    }
+
+    // Verify refresh token and get user ID
+    const { userid } = await verifyToken(refreshToken);
+    if (!userid) {
+      return res.status(401).json({ msg: "Unauthorized" });
+    }
+
+    const deptsup = await DeptSup.findOne({
+      where: { userid: userid },
+    });
+    const student = await Students.findOne({
+      where: {
+        stdid: stdid,
+      },
+    });
+    const internship = await Internshipdtl.findOne({
+      where: {
+        stdid: stdid,
+        compEvalFilled: true,
+        compEvalConfirmed: false,
+        dept_sup: deptsup.supid,
+      },
+    });
+
+    await Internshipdtl.update(
+      {
+        compEvalFilled: false,
+        interest: null,
+        attendance: null,
+        technicalablilty: null,
+        generalbehaviour: null,
+        overalleval: null,
+        summary: null,
+        generalcomments: null,
+      },
+      {
+        where: { internshipid: internship.internshipid },
+      }
+    );
+    const compsup = await CompSup.findOne({
+      where: { supid: internship.comp_sup },
+    });
+
+    const notification = await Notifications.create({
+      trigger: "Evaluation Rejected",
+      message: "Your Trainee Evaluation was Rejected!",
+      userid: student.userId,
+    });
+
+    const notification2 = await Notifications.create({
+      trigger: "Evaluation Rejected",
+      message: `Your Trainee Evaluation for ${stdid} was Rejected! Please fill it again.`,
+      userid: compsup.userid,
+    });
+
+    res.status(200).json({ msg: "Internship Rejected" });
+    // res.status(200).json(intdtl);
   } catch (error) {
     console.error(error);
     res.status(500).json({ msg: "Internal server error" });

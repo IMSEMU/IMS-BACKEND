@@ -27,12 +27,14 @@ import { getCompanies, getCompany } from "../controllers/company.controller.js";
 import {
   confirmApplication,
   confirmConfirmation,
+  confirmEvaluation,
   confirmInsurance,
   getDeptLogbook,
   getInternship,
   getSubmissions,
   rejectApplication,
   rejectConfirmation,
+  rejectEvaluation,
 } from "../controllers/deptsup.controller.js";
 import {
   approveLogbook,
@@ -78,6 +80,8 @@ router.post("/confirmcon", confirmConfirmation);
 router.post("/rejectcon", rejectConfirmation);
 router.post("/confirmins", confirmInsurance);
 router.post("/viewlogdept", getDeptLogbook);
+router.post("/confirmeval", confirmEvaluation);
+router.post("/rejecteval", rejectEvaluation);
 
 //compsup routes
 router.get("/getstd", getStudents);
