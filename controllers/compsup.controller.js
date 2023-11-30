@@ -8,7 +8,6 @@ import CompSup from "../models/compsup.model.js";
 import Users from "../models/user.model.js";
 import Notifications from "../models/notification.model.js";
 import Log from "../models/log.model.js";
-import CompEval from "../models/compeval.model.js";
 
 export const getStudents = async (req, res) => {
   try {
@@ -394,20 +393,16 @@ export const submitCompEval = async (req, res) => {
       },
     });
 
-    await CompEval.create({
-      interest: interest,
-      attendance: attendance,
-      technicalablilty: technicalAbility,
-      generalbehaviour: generalBehavior,
-      overalleval: overallEvaluation,
-      summary: summary,
-      generalcomments: generalComments,
-      internshipid: internship.internshipid,
-    });
-
     await Internshipdtl.update(
       {
         compEvalFilled: true,
+        interest: interest,
+        attendance: attendance,
+        technicalablilty: technicalAbility,
+        generalbehaviour: generalBehavior,
+        overalleval: overallEvaluation,
+        summary: summary,
+        generalcomments: generalComments,
       },
       {
         where: { internshipid: internship.internshipid },

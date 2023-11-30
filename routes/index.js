@@ -28,6 +28,7 @@ import {
   confirmApplication,
   confirmConfirmation,
   confirmInsurance,
+  getDeptLogbook,
   getInternship,
   getSubmissions,
   rejectApplication,
@@ -76,6 +77,7 @@ router.post("/rejectapp", rejectApplication);
 router.post("/confirmcon", confirmConfirmation);
 router.post("/rejectcon", rejectConfirmation);
 router.post("/confirmins", confirmInsurance);
+router.post("/viewlogdept", getDeptLogbook);
 
 //compsup routes
 router.get("/getstd", getStudents);

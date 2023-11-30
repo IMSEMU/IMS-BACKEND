@@ -12,6 +12,7 @@ import db from "../config/db.config.js";
 import IntWork from "../models/intwork.model.js";
 import Notifications from "../models/notification.model.js";
 import DeptSup from "../models/deptsup.model.js";
+import Log from "../models/log.model.js";
 
 export const getSubmissions = async (req, res) => {
   try {
@@ -571,6 +572,45 @@ export const confirmInsurance = async (req, res) => {
     });
 
     res.status(200).json({ msg: "Social Insurance Confirmed" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ msg: "Internal server error" });
+  }
+};
+
+export const getDeptLogbook = async (req, res) => {
+  const { stdid } = req.body;
+  try {
+    // Check if user is logged in
+    const refreshToken = req.cookies.refreshToken;
+    if (!refreshToken) {
+      return res.status(401).json({ msg: "Unauthorized" });
+    }
+
+    // Verify refresh token and get user ID
+    const { userid } = await verifyToken(refreshToken);
+    if (!userid) {
+      return res.status(401).json({ msg: "Unauthorized" });
+    }
+
+    const deptsup = await DeptSup.findOne({
+      where: {
+        userid: userid,
+      },
+    });
+
+    const internship = await Internshipdtl.findOne({
+      where: {
+        logConfirmed: true,
+        stdid: stdid,
+        dept_sup: deptsup.supid,
+      },
+    });
+
+    const logbookEntries = await Log.findAll({
+      where: { internshipid: internship.internshipid },
+    });
+    res.status(200).json(logbookEntries);
   } catch (error) {
     console.error(error);
     res.status(500).json({ msg: "Internal server error" });

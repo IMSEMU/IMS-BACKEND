@@ -4,7 +4,6 @@ import Students from "./student.model.js";
 import Company from "./company.model.js";
 import CompSup from "./compsup.model.js";
 import DeptSup from "./deptsup.model.js";
-import CompEval from "./compeval.model.js";
 
 const { DataTypes } = Sequelize;
 
@@ -106,6 +105,34 @@ const Internshipdtl = db.define(
       type: DataTypes.STRING,
       allowNull: true,
     },
+    interest: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+    },
+    attendance: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+    },
+    technicalablilty: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+    },
+    generalbehaviour: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+    },
+    overalleval: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+    },
+    summary: {
+      type: DataTypes.TEXT,
+      allowNull: true,
+    },
+    generalcomments: {
+      type: DataTypes.TEXT,
+      allowNull: true,
+    },
   },
   {
     freezeTableName: true,
@@ -127,12 +154,6 @@ Internshipdtl.belongsTo(CompSup, {
 });
 Internshipdtl.belongsTo(DeptSup, {
   foreignKey: "dept_sup",
-});
-
-Internshipdtl.hasOne(CompEval, {
-  foreignKey: "internshipid",
-  onDelete: "CASCADE",
-  onUpdate: "CASCADE",
 });
 
 export default Internshipdtl;
