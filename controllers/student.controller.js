@@ -4,6 +4,7 @@ import bcrypt from "bcrypt";
 import { verifyToken } from "../middleware/verifyToken.js";
 import Internshipdtl from "../models/intdetails.model.js";
 import Company from "../models/company.model.js";
+import Notifications from "../models/notification.model.js";
 
 export const Register = async (req, res) => {
   const { stdid, firstname, lastname, email, password, confPassword } =
@@ -128,6 +129,57 @@ export const getPhoto = async (req, res) => {
       attributes: ["photo"],
     });
     res.status(200).json(student.photo);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ msg: "Internal server error" });
+  }
+};
+
+export const saveReport = async (req, res) => {
+  const { docSrc } = req.body;
+  try {
+    // Check if user is logged in
+    const refreshToken = req.cookies.refreshToken;
+    if (!refreshToken) {
+      return res.status(401).json({ msg: "Unauthorized" });
+    }
+
+    // Verify refresh token and get user ID
+    const { userid } = await verifyToken(refreshToken);
+    if (!userid) {
+      return res.status(401).json({ msg: "Unauthorized" });
+    }
+
+    const student = await Students.findOne({
+      where: {
+        userId: userid,
+      },
+    });
+
+    const internship = await Internshipdtl.findOne({
+      where: {
+        stdid: student.stdid,
+        reportComplete: false,
+      },
+    });
+
+    await Internshipdtl.update(
+      {
+        reportComplete: true,
+        report: docSrc,
+      },
+      {
+        where: { internshipid: internship.internshipid },
+      }
+    );
+
+    const notification = await Notifications.create({
+      trigger: "Report Submited",
+      message: "Your Report was submitted and will be graded.",
+      userid: student.userId,
+    });
+
+    res.status(200).json({ msg: "Submission Successful" });
   } catch (error) {
     console.error(error);
     res.status(500).json({ msg: "Internal server error" });

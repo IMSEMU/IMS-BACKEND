@@ -11,6 +11,7 @@ import {
   Register,
   getPhoto,
   getStudent,
+  saveReport,
 } from "../controllers/student.controller.js";
 
 import { refreshToken } from "../controllers/RefreshToken.js";
@@ -66,6 +67,7 @@ router.get("/getstudent", getStudent);
 router.post("/createapp", createApplication);
 router.post("/submitins", submitInsurance);
 router.get("/getphoto", getPhoto);
+router.post("/savereport", saveReport);
 
 //company routes
 router.get("/getcomps", getCompanies);

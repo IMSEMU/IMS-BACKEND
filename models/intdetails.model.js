@@ -133,7 +133,12 @@ const Internshipdtl = db.define(
       type: DataTypes.TEXT,
       allowNull: true,
     },
+    report: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
   },
+
   {
     freezeTableName: true,
   }
