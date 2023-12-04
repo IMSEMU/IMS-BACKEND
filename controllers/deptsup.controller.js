@@ -61,7 +61,7 @@ export const getSubmissions = async (req, res) => {
           },
           {
             reportComplete: true,
-            reportConfirmed: false,
+            deptEvalFilled: false,
           },
         ],
         dept_sup: deptsup.supid,
@@ -178,7 +178,8 @@ export const getInternship = async (req, res) => {
       generalbehaviour: internship.generalbehaviour,
       overalleval: internship.overalleval,
       summary: internship.summary,
-      generalcomments: internship.generalcomments,
+      generalcomments: internship.compgeneralcomments,
+      reportDocSrc: internship.report,
       intwork: intwork,
     };
 
@@ -281,7 +282,7 @@ export const confirmApplication = async (req, res) => {
       }
     );
 
-    const notification = await Notifications.create({
+    await Notifications.create({
       trigger: "Application Confirmed",
       message: "Your Internship Application was Confirmed!",
       userid: student.userId,
@@ -369,7 +370,7 @@ export const rejectApplication = async (req, res) => {
       }
     }
 
-    const notification = await Notifications.create({
+    await Notifications.create({
       trigger: "Application Rejected",
       message: "Your Internship Application was Rejected!",
       userid: student.userId,
@@ -432,13 +433,13 @@ export const confirmConfirmation = async (req, res) => {
       where: { supid: internship.comp_sup },
     });
 
-    const notification = await Notifications.create({
+    await Notifications.create({
       trigger: "Confirmation Confirmed",
       message: "Your Internship Confirmation was Confirmed!",
       userid: student.userId,
     });
 
-    const notification2 = await Notifications.create({
+    await Notifications.create({
       trigger: "Confirmation Confirmed",
       message: `Your Internship Confirmation for ${stdid} was Confirmed!`,
       userid: compsup.userid,
@@ -507,13 +508,13 @@ export const rejectConfirmation = async (req, res) => {
       },
     });
 
-    const notification = await Notifications.create({
+    await Notifications.create({
       trigger: "Confirmation Rejected",
       message: "Your Internship Confirmation was Rejected!",
       userid: student.userId,
     });
 
-    const notification2 = await Notifications.create({
+    await Notifications.create({
       trigger: "Confirmation Rejected",
       message: `Your Internship Confirmation for ${stdid} was Rejected! Please fill it again.`,
       userid: compsup.userid,
@@ -572,7 +573,7 @@ export const confirmInsurance = async (req, res) => {
       }
     );
 
-    const notification = await Notifications.create({
+    await Notifications.create({
       trigger: "Isurance Confirmed",
       message: "Your Social Insurance Form was Confirmed!",
       userid: student.userId,
@@ -673,13 +674,13 @@ export const confirmEvaluation = async (req, res) => {
       where: { supid: internship.comp_sup },
     });
 
-    const notification = await Notifications.create({
+    await Notifications.create({
       trigger: "Evaluation Confirmed",
       message: "Your Trainee Evaluation was Confirmed!",
       userid: student.userId,
     });
 
-    const notification2 = await Notifications.create({
+    await Notifications.create({
       trigger: "Evaluation Confirmed",
       message: `Your Trainee Evaluation for ${stdid} was Confirmed!`,
       userid: compsup.userid,
@@ -734,7 +735,7 @@ export const rejectEvaluation = async (req, res) => {
         generalbehaviour: null,
         overalleval: null,
         summary: null,
-        generalcomments: null,
+        compgeneralcomments: null,
       },
       {
         where: { internshipid: internship.internshipid },
@@ -744,13 +745,13 @@ export const rejectEvaluation = async (req, res) => {
       where: { supid: internship.comp_sup },
     });
 
-    const notification = await Notifications.create({
+    await Notifications.create({
       trigger: "Evaluation Rejected",
       message: "Your Trainee Evaluation was Rejected!",
       userid: student.userId,
     });
 
-    const notification2 = await Notifications.create({
+    await Notifications.create({
       trigger: "Evaluation Rejected",
       message: `Your Trainee Evaluation for ${stdid} was Rejected! Please fill it again.`,
       userid: compsup.userid,
@@ -758,6 +759,114 @@ export const rejectEvaluation = async (req, res) => {
 
     res.status(200).json({ msg: "Internship Rejected" });
     // res.status(200).json(intdtl);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ msg: "Internal server error" });
+  }
+};
+
+export const submitDeptEval = async (req, res) => {
+  const {
+    stdid,
+    quality,
+    itwork,
+    knowledge,
+    answeringQuestions,
+    grade,
+    generalComments,
+  } = req.body;
+  try {
+    // Check if user is logged in
+    const refreshToken = req.cookies.refreshToken;
+    if (!refreshToken) {
+      return res.status(401).json({ msg: "Unauthorized" });
+    }
+
+    // Verify refresh token and get user ID
+    const { userid } = await verifyToken(refreshToken);
+    if (!userid) {
+      return res.status(401).json({ msg: "Unauthorized" });
+    }
+
+    const deptsup = await DeptSup.findOne({
+      where: {
+        userid: userid,
+      },
+    });
+
+    const student = await Students.findOne({
+      where: { stdid: stdid },
+    });
+
+    const internship = await Internshipdtl.findOne({
+      where: {
+        reportComplete: true,
+        deptEvalFilled: false,
+        stdid: stdid,
+      },
+    });
+
+    await Internshipdtl.update(
+      {
+        deptEvalFilled: true,
+        quality: quality,
+        itwork: itwork,
+        knowledge: knowledge,
+        answeringquestions: answeringQuestions,
+        overallresult: grade,
+        deptgeneralComments: generalComments,
+      },
+      {
+        where: { internshipid: internship.internshipid },
+      }
+    );
+
+    if (grade === "S") {
+      await Internshipdtl.update(
+        {
+          intComplete: true,
+        },
+        {
+          where: { internshipid: internship.internshipid },
+        }
+      );
+      const stduser = await Users.findOne({
+        where: { userid: student.userId },
+      });
+      await Notifications.create({
+        trigger: "Internship Evaluated",
+        message: "Your Internship was Satisfactory!",
+        userid: student.userId,
+      });
+      const url = " ";
+      const token = " ";
+
+      await new Email(stduser.email, url, token).sendSatisfactoryInternship();
+      if (internship.workingDays === "20") {
+        const previousInternships = await Internshipdtl.findAll({
+          where: { stdid: stdid, intComplete: true },
+        });
+        if (previousInternships.length === 1) {
+          await Internshipdtl.create({
+            stdid: stdid,
+            dept_sup: "1",
+          });
+        }
+      }
+    } else {
+      await Notifications.create({
+        trigger: "Internship Evaluated",
+        message:
+          "Your Internship was Unsatisfactory! You have to reapply for another internship.",
+        userid: student.userId,
+      });
+      await Internshipdtl.create({
+        stdid: stdid,
+        dept_sup: "1",
+      });
+    }
+
+    res.status(200).json({ msg: "Evaluation Successful" });
   } catch (error) {
     console.error(error);
     res.status(500).json({ msg: "Internal server error" });

@@ -82,11 +82,6 @@ const Internshipdtl = db.define(
       defaultValue: false,
       allowNull: false,
     },
-    reportConfirmed: {
-      type: DataTypes.BOOLEAN,
-      defaultValue: false,
-      allowNull: false,
-    },
     deptEvalFilled: {
       type: DataTypes.BOOLEAN,
       defaultValue: false,
@@ -129,12 +124,36 @@ const Internshipdtl = db.define(
       type: DataTypes.TEXT,
       allowNull: true,
     },
-    generalcomments: {
+    compgeneralcomments: {
       type: DataTypes.TEXT,
       allowNull: true,
     },
     report: {
       type: DataTypes.STRING,
+      allowNull: true,
+    },
+    quality: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+    },
+    itwork: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+    },
+    knowledge: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+    },
+    answeringquestions: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+    },
+    overallresult: {
+      type: DataTypes.CHAR,
+      allowNull: true,
+    },
+    deptgeneralComments: {
+      type: DataTypes.TEXT,
       allowNull: true,
     },
   },

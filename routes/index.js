@@ -36,6 +36,7 @@ import {
   rejectApplication,
   rejectConfirmation,
   rejectEvaluation,
+  submitDeptEval,
 } from "../controllers/deptsup.controller.js";
 import {
   approveLogbook,
@@ -84,6 +85,7 @@ router.post("/confirmins", confirmInsurance);
 router.post("/viewlogdept", getDeptLogbook);
 router.post("/confirmeval", confirmEvaluation);
 router.post("/rejecteval", rejectEvaluation);
+router.post("/submitdepteval", submitDeptEval);
 
 //compsup routes
 router.get("/getstd", getStudents);

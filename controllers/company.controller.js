@@ -44,7 +44,7 @@ export const getCompany = async (req, res) => {
       where: { userid: userid },
     });
     const intdtl = await Internshipdtl.findOne({
-      where: { stdid: std.stdid },
+      where: { stdid: std.stdid, overallresult: null },
     });
 
     const comp = await Company.findOne({

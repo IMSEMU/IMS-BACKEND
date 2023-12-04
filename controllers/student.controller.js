@@ -79,7 +79,7 @@ export const getStudent = async (req, res) => {
       attributes: ["userId", "stdid", "phoneno", "address"],
     });
     const intdtl = await Internshipdtl.findOne({
-      where: { stdid: std.stdid },
+      where: { stdid: std.stdid, overallresult: null },
     });
     const company = await Company.findOne({
       where: { companyid: intdtl.companyid },
@@ -173,7 +173,7 @@ export const saveReport = async (req, res) => {
       }
     );
 
-    const notification = await Notifications.create({
+    await Notifications.create({
       trigger: "Report Submited",
       message: "Your Report was submitted and will be graded.",
       userid: student.userId,

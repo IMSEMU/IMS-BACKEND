@@ -183,7 +183,7 @@ export const saveConForm = async (req, res) => {
       }
     );
 
-    const notification = await Notifications.create({
+    await Notifications.create({
       trigger: "Confirmation Submitted",
       message:
         "Your Internship Confirmation was submitted and is awaiting approval.",
@@ -279,7 +279,7 @@ export const approveLogbook = async (req, res) => {
       }
     );
 
-    const notification = await Notifications.create({
+    await Notifications.create({
       trigger: "Logbook Approved",
       message: "Your Logbook was approved!",
       userid: student.userId,
@@ -335,7 +335,7 @@ export const rejectLogbook = async (req, res) => {
       }
     );
 
-    const notification = await Notifications.create({
+    await Notifications.create({
       trigger: "Logbook Rejected",
       message:
         "Your Logbook was rejected! Correct it and submit again for approval.",
@@ -362,7 +362,6 @@ export const submitCompEval = async (req, res) => {
     generalComments,
   } = req.body;
   try {
-    console.log(generalBehavior);
     // Check if user is logged in
     const refreshToken = req.cookies.refreshToken;
     if (!refreshToken) {
@@ -402,7 +401,7 @@ export const submitCompEval = async (req, res) => {
         generalbehaviour: generalBehavior,
         overalleval: overallEvaluation,
         summary: summary,
-        generalcomments: generalComments,
+        compgeneralcomments: generalComments,
       },
       {
         where: { internshipid: internship.internshipid },
