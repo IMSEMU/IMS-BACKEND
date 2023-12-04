@@ -156,7 +156,7 @@ export const submitInsurance = async (req, res) => {
     const intdtl = await Internshipdtl.findOne({
       where: {
         stdid: student.stdid,
-        filledSocial: 0,
+        filledSocial: false,
       },
     });
 

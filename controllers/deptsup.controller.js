@@ -13,6 +13,7 @@ import IntWork from "../models/intwork.model.js";
 import Notifications from "../models/notification.model.js";
 import DeptSup from "../models/deptsup.model.js";
 import Log from "../models/log.model.js";
+import Announcements from "../models/announcement.model.js";
 
 export const getSubmissions = async (req, res) => {
   try {
@@ -612,6 +613,7 @@ export const getDeptLogbook = async (req, res) => {
         logConfirmed: true,
         stdid: stdid,
         dept_sup: deptsup.supid,
+        overallresult: null,
       },
     });
 
@@ -867,6 +869,62 @@ export const submitDeptEval = async (req, res) => {
     }
 
     res.status(200).json({ msg: "Evaluation Successful" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ msg: "Internal server error" });
+  }
+};
+
+export const addAnnouncement = async (req, res) => {
+  const { title, content } = req.body;
+  try {
+    // Check if user is logged in
+    const refreshToken = req.cookies.refreshToken;
+    if (!refreshToken) {
+      return res.status(401).json({ msg: "Unauthorized" });
+    }
+
+    // Verify refresh token and get user ID
+    const { userid } = await verifyToken(refreshToken);
+    if (!userid) {
+      return res.status(401).json({ msg: "Unauthorized" });
+    }
+
+    const deptsup = await DeptSup.findOne({
+      where: {
+        userid: userid,
+      },
+    });
+
+    const announcement = await Announcements.create({
+      title: title,
+      content: content,
+      supid: deptsup.supid,
+    });
+
+    res.status(200).json(announcement);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ msg: "Internal server error" });
+  }
+};
+
+export const getAnnouncements = async (req, res) => {
+  try {
+    // Check if user is logged in
+    const refreshToken = req.cookies.refreshToken;
+    if (!refreshToken) {
+      return res.status(401).json({ msg: "Unauthorized" });
+    }
+
+    // Verify refresh token and get user ID
+    const { userid } = await verifyToken(refreshToken);
+    if (!userid) {
+      return res.status(401).json({ msg: "Unauthorized" });
+    }
+
+    const announcements = await Announcements.findAll();
+    res.status(200).json(announcements);
   } catch (error) {
     console.error(error);
     res.status(500).json({ msg: "Internal server error" });
