@@ -909,7 +909,8 @@ export const addAnnouncement = async (req, res) => {
   }
 };
 
-export const getAnnouncements = async (req, res) => {
+export const editAnnouncement = async (req, res) => {
+  const { id, title, content } = req.body;
   try {
     // Check if user is logged in
     const refreshToken = req.cookies.refreshToken;
@@ -923,8 +924,65 @@ export const getAnnouncements = async (req, res) => {
       return res.status(401).json({ msg: "Unauthorized" });
     }
 
-    const announcements = await Announcements.findAll();
-    res.status(200).json(announcements);
+    const deptsup = await DeptSup.findOne({
+      where: {
+        userid: userid,
+      },
+    });
+
+    const announcement = await Announcements.findOne({
+      where: { announcementid: id },
+    });
+
+    if (announcement.supid === deptsup.supid) {
+      await Announcements.update(
+        {
+          title: title,
+          content: content,
+        },
+        { where: { announcementid: id } }
+      );
+      res.status(200).json({ msg: "Announcement Edited Successfully!" });
+    } else {
+      return res.status(401).json({ msg: "Unauthorized" });
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ msg: "Internal server error" });
+  }
+};
+
+export const deleteAnnouncement = async (req, res) => {
+  const { id } = req.body;
+  try {
+    // Check if user is logged in
+    const refreshToken = req.cookies.refreshToken;
+    if (!refreshToken) {
+      return res.status(401).json({ msg: "Unauthorized" });
+    }
+
+    // Verify refresh token and get user ID
+    const { userid } = await verifyToken(refreshToken);
+    if (!userid) {
+      return res.status(401).json({ msg: "Unauthorized" });
+    }
+
+    const deptsup = await DeptSup.findOne({
+      where: {
+        userid: userid,
+      },
+    });
+
+    const announcement = await Announcements.findOne({
+      where: { announcementid: id },
+    });
+
+    if (announcement.supid === deptsup.supid) {
+      await Announcements.destroy({ where: { announcementid: id } });
+      res.status(200).json({ msg: "Announcement Deleted Successfully!" });
+    } else {
+      return res.status(401).json({ msg: "Unauthorized" });
+    }
   } catch (error) {
     console.error(error);
     res.status(500).json({ msg: "Internal server error" });

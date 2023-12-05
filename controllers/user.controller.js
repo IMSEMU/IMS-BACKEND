@@ -6,6 +6,7 @@ import { Sequelize, where } from "sequelize";
 import bcrypt from "bcrypt";
 import Notifications from "../models/notification.model.js";
 import { verifyToken } from "../middleware/verifyToken.js";
+import Announcements from "../models/announcement.model.js";
 
 export const getUsers = async (req, res) => {
   try {
@@ -230,6 +231,16 @@ export const getNotifications = async (req, res) => {
     });
 
     res.status(200).json(notifications);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ msg: "Internal server error" });
+  }
+};
+
+export const getAnnouncements = async (req, res) => {
+  try {
+    const announcements = await Announcements.findAll();
+    res.status(200).json(announcements);
   } catch (error) {
     console.error(error);
     res.status(500).json({ msg: "Internal server error" });

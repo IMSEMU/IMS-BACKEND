@@ -5,6 +5,7 @@ import {
   ForgotPassword,
   newPassword,
   getNotifications,
+  getAnnouncements,
 } from "../controllers/user.controller.js";
 
 import {
@@ -31,7 +32,8 @@ import {
   confirmConfirmation,
   confirmEvaluation,
   confirmInsurance,
-  getAnnouncements,
+  deleteAnnouncement,
+  editAnnouncement,
   getDeptLogbook,
   getInternship,
   getSubmissions,
@@ -58,6 +60,7 @@ router.post("/login", Login);
 router.get("/token", refreshToken);
 router.delete("/logout", Logout);
 router.get("/getnotifs", getNotifications);
+router.get("/getannouncements", getAnnouncements);
 
 // Logbook
 router.post("/createlog", createLogEntry);
@@ -89,7 +92,8 @@ router.post("/confirmeval", confirmEvaluation);
 router.post("/rejecteval", rejectEvaluation);
 router.post("/submitdepteval", submitDeptEval);
 router.post("/addannouncement", addAnnouncement);
-router.get("/getannouncements", getAnnouncements);
+router.post("/editannouncement", editAnnouncement);
+router.post("/deleteannouncement", deleteAnnouncement);
 
 //compsup routes
 router.get("/getstd", getStudents);
