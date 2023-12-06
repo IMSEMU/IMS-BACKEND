@@ -14,6 +14,7 @@ import Notifications from "../models/notification.model.js";
 import DeptSup from "../models/deptsup.model.js";
 import Log from "../models/log.model.js";
 import Announcements from "../models/announcement.model.js";
+import CompletedInternships from "../models/completedinternships.model.js";
 
 export const getStudents = async (req, res) => {
   try {
@@ -881,6 +882,7 @@ export const submitDeptEval = async (req, res) => {
         reportComplete: true,
         deptEvalFilled: false,
         stdid: stdid,
+        dept_sup: deptsup.supid,
       },
     });
 
@@ -920,6 +922,29 @@ export const submitDeptEval = async (req, res) => {
       const token = " ";
 
       await new Email(stduser.email, url, token).sendSatisfactoryInternship();
+
+      const compsup = await CompSup.findOne({
+        where: { supid: internship.comp_sup },
+      });
+
+      const alreadyCompleted = await CompletedInternships.findOne({
+        where: { compid: compsup.companyid },
+      });
+      const currentDate = new Date();
+      if (!alreadyCompleted) {
+        await CompletedInternships.create({
+          compid: compsup.companyid,
+          year: currentDate,
+        });
+      } else {
+        await CompletedInternships.update(
+          {
+            year: currentDate,
+          },
+          { where: { cintid: alreadyCompleted.cintid } }
+        );
+      }
+
       if (internship.workingDays === "20") {
         const previousInternships = await Internshipdtl.findAll({
           where: { stdid: stdid, intComplete: true },

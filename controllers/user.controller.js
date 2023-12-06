@@ -7,6 +7,8 @@ import bcrypt from "bcrypt";
 import Notifications from "../models/notification.model.js";
 import { verifyToken } from "../middleware/verifyToken.js";
 import Announcements from "../models/announcement.model.js";
+import CompletedInternships from "../models/completedinternships.model.js";
+import Company from "../models/company.model.js";
 
 export const getUsers = async (req, res) => {
   try {
@@ -185,7 +187,6 @@ export const newPassword = async (req, res) => {
   if (!user) {
     res.status(400).json({ msg: "Token is invalid or has expired" });
   } else {
-    console.log(user);
     const { password, confPassword } = req.body;
     if (password == "") {
       return res.status(400).json({ msg: "Password cannot be blank" });
@@ -241,6 +242,29 @@ export const getAnnouncements = async (req, res) => {
   try {
     const announcements = await Announcements.findAll();
     res.status(200).json(announcements);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ msg: "Internal server error" });
+  }
+};
+
+export const getCompletedInternships = async (req, res) => {
+  try {
+    const completedinternships = await CompletedInternships.findAll();
+
+    const companies = [];
+    for (const internship of completedinternships) {
+      console.log(internship);
+      const company = await Company.findOne({
+        where: { companyid: internship.compid },
+      });
+
+      companies.push({
+        year: internship.year,
+        company: company,
+      });
+    }
+    res.status(200).json(companies);
   } catch (error) {
     console.error(error);
     res.status(500).json({ msg: "Internal server error" });

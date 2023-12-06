@@ -38,7 +38,6 @@ export const createLogEntry = async (req, res) => {
         day: day,
       },
     });
-    console.log(existingLogEntry);
 
     if (existingLogEntry) {
       return res
@@ -51,7 +50,7 @@ export const createLogEntry = async (req, res) => {
         date: date,
       },
     });
-    console.log(existingLogEntry1);
+
     if (existingLogEntry1) {
       return res
         .status(400)

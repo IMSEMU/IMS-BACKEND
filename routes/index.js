@@ -6,6 +6,7 @@ import {
   newPassword,
   getNotifications,
   getAnnouncements,
+  getCompletedInternships,
 } from "../controllers/user.controller.js";
 
 import {
@@ -63,6 +64,7 @@ router.get("/token", refreshToken);
 router.delete("/logout", Logout);
 router.get("/getnotifs", getNotifications);
 router.get("/getannouncements", getAnnouncements);
+router.get("/getcompletedint", getCompletedInternships);
 
 // Logbook
 router.post("/createlog", createLogEntry);
