@@ -1,7 +1,6 @@
 import { Sequelize } from "sequelize";
 import db from "../config/db.config.js";
 import Students from "./student.model.js";
-import Company from "./company.model.js";
 import CompSup from "./compsup.model.js";
 import DeptSup from "./deptsup.model.js";
 
@@ -169,9 +168,6 @@ const Internshipdtl = db.define(
 
 Internshipdtl.belongsTo(Students, {
   foreignKey: "stdid",
-});
-Internshipdtl.belongsTo(Company, {
-  foreignKey: "companyid",
 });
 Internshipdtl.belongsTo(CompSup, {
   foreignKey: "comp_sup",

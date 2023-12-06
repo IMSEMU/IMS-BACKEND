@@ -36,6 +36,7 @@ import {
   editAnnouncement,
   getDeptLogbook,
   getInternship,
+  getStudents,
   getSubmissions,
   rejectApplication,
   rejectConfirmation,
@@ -46,7 +47,6 @@ import {
   approveLogbook,
   getLogbook,
   getStudentCompany,
-  getStudents,
   getToDo,
   rejectLogbook,
   saveConForm,
@@ -95,9 +95,10 @@ router.post("/submitdepteval", submitDeptEval);
 router.post("/addannouncement", addAnnouncement);
 router.post("/editannouncement", editAnnouncement);
 router.post("/deleteannouncement", deleteAnnouncement);
+router.get("/getstd", getStudents);
 
 //compsup routes
-router.get("/getstd", getStudents);
+
 router.post("/getstdcomp", getStudentCompany);
 router.post("/submitconform", submitConForm);
 router.post("/saveconform", saveConForm);

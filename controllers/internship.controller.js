@@ -89,7 +89,6 @@ export const createApplication = async (req, res) => {
       {
         filled_iaf: 1,
         workdesc: workdesc,
-        companyid: newCompany.companyid,
         comp_sup: compSup.supid,
       },
       {
@@ -160,12 +159,16 @@ export const submitInsurance = async (req, res) => {
       },
     });
 
+    const compsup = await CompSup.findOne({
+      where: { supid: intdtl.comp_sup },
+    });
+
     await Company.update(
       {
         sgk: sgk,
       },
       {
-        where: { companyid: intdtl.companyid },
+        where: { companyid: compsup.companyid },
       }
     );
 

@@ -47,8 +47,12 @@ export const getCompany = async (req, res) => {
       where: { stdid: std.stdid, overallresult: null },
     });
 
+    const compsup = await CompSup.findOne({
+      where: { supid: intdtl.comp_sup },
+    });
+
     const comp = await Company.findOne({
-      where: { companyid: intdtl.companyid },
+      where: { companyid: compsup.companyid },
       attributes: [
         "companyid",
         "name",
@@ -59,9 +63,7 @@ export const getCompany = async (req, res) => {
         "website",
       ],
     });
-    const compsup = await CompSup.findOne({
-      where: { supid: intdtl.comp_sup },
-    });
+
     const companydtl = {
       companyid: comp.companyid,
       compname: comp.name,

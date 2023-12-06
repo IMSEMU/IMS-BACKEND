@@ -15,6 +15,63 @@ import DeptSup from "../models/deptsup.model.js";
 import Log from "../models/log.model.js";
 import Announcements from "../models/announcement.model.js";
 
+export const getStudents = async (req, res) => {
+  try {
+    // Check if user is logged in
+    const refreshToken = req.cookies.refreshToken;
+    if (!refreshToken) {
+      return res.status(401).json({ msg: "Unauthorized" });
+    }
+
+    // Verify refresh token and get user ID
+    const { userid } = await verifyToken(refreshToken);
+    if (!userid) {
+      return res.status(401).json({ msg: "Unauthorized" });
+    }
+
+    const dept_sup = await DeptSup.findOne({
+      where: { userid: userid },
+    });
+    const stdintdtl = await Internshipdtl.findAll({
+      where: {
+        dept_sup: dept_sup.supid,
+        overallresult: null,
+      },
+    });
+
+    const students = [];
+    for (const internshipDetail of stdintdtl) {
+      const student = await Students.findOne({
+        where: { stdid: internshipDetail.stdid },
+      });
+      const stduser = await Users.findOne({
+        where: { userid: student.userId },
+        attributes: ["firstname", "lastname", "email"],
+      });
+      const compsup = await CompSup.findOne({
+        where: { supid: internshipDetail.comp_sup },
+      });
+      const company = await Company.findOne({
+        where: { companyid: compsup.companyid },
+      });
+      if (student) {
+        students.push({
+          internshipDetail,
+          student,
+          stduser,
+          compsup,
+          company,
+        });
+      }
+    }
+
+    res.status(200).json(students);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ msg: "Internal server error" });
+  }
+};
+
 export const getSubmissions = async (req, res) => {
   try {
     // Check if user is logged in
@@ -126,16 +183,17 @@ export const getInternship = async (req, res) => {
         userid: student.userId,
       },
     });
-    const company = await Company.findOne({
-      where: {
-        companyid: internship.companyid,
-      },
-    });
     const compsup = await CompSup.findOne({
       where: {
         supid: internship.comp_sup,
       },
     });
+    const company = await Company.findOne({
+      where: {
+        companyid: compsup.companyid,
+      },
+    });
+
     const iaf = {
       photo: student.photo,
       stdid: student.stdid,
@@ -337,17 +395,20 @@ export const rejectApplication = async (req, res) => {
         dept_sup: deptsup.supid,
       },
     });
+
+    const compsup = await CompSup.findOne({
+      where: { supid: internship.compsup },
+    });
     const otherSupStudents = await Internshipdtl.findAll({
       where: { comp_sup: internship.comp_sup },
     });
     const otherCompStudents = await Internshipdtl.findAll({
-      where: { companyid: internship.companyid },
+      where: { companyid: compsup.companyid },
     });
-    const updatedInternship = await Internshipdtl.update(
+    await Internshipdtl.update(
       {
         filled_iaf: false,
         workdesc: null,
-        companyid: null,
         comp_sup: null,
       },
       {
@@ -364,9 +425,8 @@ export const rejectApplication = async (req, res) => {
         where: { supid: std.comp_sup },
       });
       if (otherCompStudents.length === 1) {
-        const int = otherCompStudents[0];
         await Company.destroy({
-          where: { companyid: int.companyid },
+          where: { companyid: compsup.companyid },
         });
       }
     }

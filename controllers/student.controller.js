@@ -81,8 +81,11 @@ export const getStudent = async (req, res) => {
     const intdtl = await Internshipdtl.findOne({
       where: { stdid: std.stdid, overallresult: null },
     });
+    const compsup = await CompSup.findOne({
+      where: { supid: intdtl.comp_sup },
+    });
     const company = await Company.findOne({
-      where: { companyid: intdtl.companyid },
+      where: { companyid: compsup.companyid },
     });
     const student = {
       userid: std.userId,

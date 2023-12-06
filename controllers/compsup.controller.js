@@ -9,7 +9,8 @@ import Users from "../models/user.model.js";
 import Notifications from "../models/notification.model.js";
 import Log from "../models/log.model.js";
 
-export const getStudents = async (req, res) => {
+export const getStudentCompany = async (req, res) => {
+  const { stdid } = req.body;
   try {
     // Check if user is logged in
     const refreshToken = req.cookies.refreshToken;
@@ -26,34 +27,6 @@ export const getStudents = async (req, res) => {
     const compsup = await CompSup.findOne({
       where: { userid: userid },
     });
-    const conFormStudents = await Internshipdtl.findAll({
-      where: {
-        comp_sup: compsup.supid,
-        iafConfirmed: true,
-        filledConForm: false,
-      },
-    });
-
-    res.status(200).json(conFormStudents);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ msg: "Internal server error" });
-  }
-};
-export const getStudentCompany = async (req, res) => {
-  const { stdid } = req.body;
-  try {
-    // Check if user is logged in
-    const refreshToken = req.cookies.refreshToken;
-    if (!refreshToken) {
-      return res.status(401).json({ msg: "Unauthorized" });
-    }
-
-    // Verify refresh token and get user ID
-    const { userid } = await verifyToken(refreshToken);
-    if (!userid) {
-      return res.status(401).json({ msg: "Unauthorized" });
-    }
 
     const std = await Students.findOne({
       where: { stdid: stdid },
@@ -63,17 +36,9 @@ export const getStudentCompany = async (req, res) => {
       where: { userid: std.userId },
     });
 
-    const intdtl = await Internshipdtl.findOne({
-      where: {
-        stdid: stdid,
-        iafConfirmed: true,
-        filledConForm: false,
-      },
-    });
-
     const company = await Company.findOne({
       where: {
-        companyid: intdtl.companyid,
+        companyid: compsup.companyid,
       },
     });
 
