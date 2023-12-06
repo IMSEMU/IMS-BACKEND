@@ -47,6 +47,7 @@ import {
   getLogbook,
   getStudentCompany,
   getStudents,
+  getToDo,
   rejectLogbook,
   saveConForm,
   submitCompEval,
@@ -104,6 +105,7 @@ router.post("/viewsubmittedlog", getLogbook);
 router.post("/approvelog", approveLogbook);
 router.post("/rejectlog", rejectLogbook);
 router.post("/submitcompeval", submitCompEval);
+router.get("/gettodos", getToDo);
 
 /* forgot password */
 router.post("/forgotpassword", ForgotPassword);

@@ -414,3 +414,47 @@ export const submitCompEval = async (req, res) => {
     res.status(500).json({ msg: "Internal server error" });
   }
 };
+
+export const getToDo = async (req, res) => {
+  try {
+    // Check if user is logged in
+    const refreshToken = req.cookies.refreshToken;
+    if (!refreshToken) {
+      return res.status(401).json({ msg: "Unauthorized" });
+    }
+
+    // Verify refresh token and get user ID
+    const { userid } = await verifyToken(refreshToken);
+    if (!userid) {
+      return res.status(401).json({ msg: "Unauthorized" });
+    }
+
+    const compsup = await CompSup.findOne({
+      where: { userid: userid },
+    });
+
+    const intdtl = await Internshipdtl.findAll({
+      where: {
+        [Op.or]: [
+          {
+            iafConfirmed: true,
+            filledConForm: false,
+          },
+          {
+            logComplete: true,
+            logConfirmed: false,
+          },
+          {
+            logConfirmed: true,
+            compEvalFilled: false,
+          },
+        ],
+        comp_sup: compsup.supid,
+      },
+    });
+    res.status(200).json(intdtl);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ msg: "Internal server error" });
+  }
+};
