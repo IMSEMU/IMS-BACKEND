@@ -35,33 +35,49 @@ export const getStudents = async (req, res) => {
     const stdintdtl = await Internshipdtl.findAll({
       where: {
         dept_sup: dept_sup.supid,
-        overallresult: null,
       },
     });
 
     const students = [];
+    const check = [];
+    const internships = [];
     for (const internshipDetail of stdintdtl) {
       const student = await Students.findOne({
         where: { stdid: internshipDetail.stdid },
       });
-      const stduser = await Users.findOne({
-        where: { userid: student.userId },
-        attributes: ["firstname", "lastname", "email"],
-      });
-      const compsup = await CompSup.findOne({
-        where: { supid: internshipDetail.comp_sup },
-      });
-      const company = await Company.findOne({
-        where: { companyid: compsup.companyid },
-      });
-      if (student) {
+      if (student && !check.includes(student.stdid)) {
+        const stduser = await Users.findOne({
+          where: { userid: student.userId },
+          attributes: ["firstname", "lastname", "email"],
+        });
+        const allInternships = await Internshipdtl.findAll({
+          where: { stdid: student.stdid, dept_sup: dept_sup.supid },
+        });
+
+        for (const internshipdtl of allInternships) {
+          const compsup = await CompSup.findOne({
+            where: { supid: internshipdtl.comp_sup },
+          });
+          if (compsup) {
+            const company = await Company.findOne({
+              where: { companyid: compsup.companyid },
+            });
+
+            internships.push({
+              internshipdtl,
+              compsup,
+              company,
+            });
+          }
+        }
+
         students.push({
-          internshipDetail,
           student,
           stduser,
-          compsup,
-          company,
+          internships: internships,
         });
+
+        check.push(student.stdid);
       }
     }
 

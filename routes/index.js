@@ -45,6 +45,7 @@ import {
 } from "../controllers/deptsup.controller.js";
 import {
   approveLogbook,
+  compGetStudents,
   getLogbook,
   getStudentCompany,
   getToDo,
@@ -107,6 +108,7 @@ router.post("/approvelog", approveLogbook);
 router.post("/rejectlog", rejectLogbook);
 router.post("/submitcompeval", submitCompEval);
 router.get("/gettodos", getToDo);
+router.get("/compgetstd", compGetStudents);
 
 /* forgot password */
 router.post("/forgotpassword", ForgotPassword);

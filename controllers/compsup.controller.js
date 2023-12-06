@@ -8,6 +8,75 @@ import CompSup from "../models/compsup.model.js";
 import Users from "../models/user.model.js";
 import Notifications from "../models/notification.model.js";
 import Log from "../models/log.model.js";
+import DeptSup from "../models/deptsup.model.js";
+
+export const compGetStudents = async (req, res) => {
+  try {
+    // Check if user is logged in
+    const refreshToken = req.cookies.refreshToken;
+    if (!refreshToken) {
+      return res.status(401).json({ msg: "Unauthorized" });
+    }
+
+    // Verify refresh token and get user ID
+    const { userid } = await verifyToken(refreshToken);
+    if (!userid) {
+      return res.status(401).json({ msg: "Unauthorized" });
+    }
+
+    const compsup = await CompSup.findOne({
+      where: { userid: userid },
+    });
+    const stdintdtl = await Internshipdtl.findAll({
+      where: {
+        comp_sup: compsup.supid,
+      },
+    });
+
+    const students = [];
+    const check = [];
+    for (const internshipDetail of stdintdtl) {
+      const student = await Students.findOne({
+        where: { stdid: internshipDetail.stdid },
+      });
+      if (student && !check.includes(student.stdid)) {
+        const stduser = await Users.findOne({
+          where: { userid: student.userId },
+          attributes: ["firstname", "lastname", "email"],
+        });
+        const internships = [];
+
+        const allInternships = await Internshipdtl.findAll({
+          where: { stdid: student.stdid, comp_sup: compsup.supid },
+        });
+
+        for (const internshipdtl of allInternships) {
+          const deptsup = await DeptSup.findOne({
+            where: { supid: internshipdtl.dept_sup },
+          });
+
+          internships.push({
+            internshipdtl,
+            deptsup,
+          });
+        }
+
+        students.push({
+          student,
+          stduser,
+          internships: internships,
+        });
+
+        check.push(student.stdid);
+      }
+    }
+
+    res.status(200).json(students);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ msg: "Internal server error" });
+  }
+};
 
 export const getStudentCompany = async (req, res) => {
   const { stdid } = req.body;
