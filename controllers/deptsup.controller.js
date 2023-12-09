@@ -15,6 +15,7 @@ import DeptSup from "../models/deptsup.model.js";
 import Log from "../models/log.model.js";
 import Announcements from "../models/announcement.model.js";
 import CompletedInternships from "../models/completedinternships.model.js";
+import IntPositions from "../models/intpositions.model.js";
 
 export const getStudents = async (req, res) => {
   try {
@@ -1081,6 +1082,157 @@ export const deleteAnnouncement = async (req, res) => {
     if (announcement.supid === deptsup.supid) {
       await Announcements.destroy({ where: { announcementid: id } });
       res.status(200).json({ msg: "Announcement Deleted Successfully!" });
+    } else {
+      return res.status(401).json({ msg: "Unauthorized" });
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ msg: "Internal server error" });
+  }
+};
+
+export const addInternshipPosition = async (req, res) => {
+  const {
+    companyname,
+    country,
+    city,
+    desc,
+    reqs,
+    applyby,
+    image,
+    contact,
+    position,
+  } = req.body;
+  try {
+    // Check if user is logged in
+    const refreshToken = req.cookies.refreshToken;
+    if (!refreshToken) {
+      return res.status(401).json({ msg: "Unauthorized" });
+    }
+
+    // Verify refresh token and get user ID
+    const { userid } = await verifyToken(refreshToken);
+    if (!userid) {
+      return res.status(401).json({ msg: "Unauthorized" });
+    }
+
+    const deptsup = await DeptSup.findOne({
+      where: {
+        userid: userid,
+      },
+    });
+
+    const intPosition = await IntPositions.create({
+      compname: companyname,
+      country: country,
+      city: city,
+      desc: desc,
+      requirements: reqs,
+      photo: image,
+      applyby: applyby,
+      contact: contact,
+      position: position,
+      postedby: deptsup.supid,
+    });
+
+    res.status(200).json(intPosition);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ msg: "Internal server error" });
+  }
+};
+
+export const editInternshipPosition = async (req, res) => {
+  const {
+    id,
+    companyname,
+    country,
+    city,
+    desc,
+    reqs,
+    applyby,
+    image,
+    contact,
+    position,
+  } = req.body;
+  try {
+    // Check if user is logged in
+    const refreshToken = req.cookies.refreshToken;
+    if (!refreshToken) {
+      return res.status(401).json({ msg: "Unauthorized" });
+    }
+
+    // Verify refresh token and get user ID
+    const { userid } = await verifyToken(refreshToken);
+    if (!userid) {
+      return res.status(401).json({ msg: "Unauthorized" });
+    }
+
+    const deptsup = await DeptSup.findOne({
+      where: {
+        userid: userid,
+      },
+    });
+
+    const intPosition = await IntPositions.findOne({
+      where: { posid: id },
+    });
+
+    if (intPosition.postedby === deptsup.supid) {
+      await IntPositions.update(
+        {
+          compname: companyname,
+          country: country,
+          city: city,
+          desc: desc,
+          requirements: reqs,
+          photo: image,
+          applyby: applyby,
+          contact: contact,
+          position: position,
+        },
+        { where: { posid: id } }
+      );
+      res.status(200).json({ msg: "Announcement Edited Successfully!" });
+    } else {
+      return res.status(401).json({ msg: "Unauthorized" });
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ msg: "Internal server error" });
+  }
+};
+
+export const deleteInternshipPosition = async (req, res) => {
+  const { id } = req.body;
+  try {
+    // Check if user is logged in
+    const refreshToken = req.cookies.refreshToken;
+    if (!refreshToken) {
+      return res.status(401).json({ msg: "Unauthorized" });
+    }
+
+    // Verify refresh token and get user ID
+    const { userid } = await verifyToken(refreshToken);
+    if (!userid) {
+      return res.status(401).json({ msg: "Unauthorized" });
+    }
+
+    const deptsup = await DeptSup.findOne({
+      where: {
+        userid: userid,
+      },
+    });
+
+    const intpositions = await IntPositions.findOne({
+      where: { posid: id },
+    });
+
+    if (intpositions.postedby === deptsup.supid) {
+      await IntPositions.destroy({ where: { posid: id } });
+      res
+        .status(200)
+        .json({ msg: "Internship Position Deleted Successfully!" });
     } else {
       return res.status(401).json({ msg: "Unauthorized" });
     }

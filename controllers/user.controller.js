@@ -9,6 +9,7 @@ import { verifyToken } from "../middleware/verifyToken.js";
 import Announcements from "../models/announcement.model.js";
 import CompletedInternships from "../models/completedinternships.model.js";
 import Company from "../models/company.model.js";
+import IntPositions from "../models/intpositions.model.js";
 
 export const getUsers = async (req, res) => {
   try {
@@ -265,6 +266,17 @@ export const getCompletedInternships = async (req, res) => {
       });
     }
     res.status(200).json(companies);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ msg: "Internal server error" });
+  }
+};
+
+export const getAvailableInternships = async (req, res) => {
+  try {
+    const internships = await IntPositions.findAll();
+
+    res.status(200).json(internships);
   } catch (error) {
     console.error(error);
     res.status(500).json({ msg: "Internal server error" });

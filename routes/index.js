@@ -7,6 +7,7 @@ import {
   getNotifications,
   getAnnouncements,
   getCompletedInternships,
+  getAvailableInternships,
 } from "../controllers/user.controller.js";
 
 import {
@@ -29,12 +30,15 @@ import {
 import { getCompanies, getCompany } from "../controllers/company.controller.js";
 import {
   addAnnouncement,
+  addInternshipPosition,
   confirmApplication,
   confirmConfirmation,
   confirmEvaluation,
   confirmInsurance,
   deleteAnnouncement,
+  deleteInternshipPosition,
   editAnnouncement,
+  editInternshipPosition,
   getDeptLogbook,
   getInternship,
   getStudents,
@@ -65,6 +69,7 @@ router.delete("/logout", Logout);
 router.get("/getnotifs", getNotifications);
 router.get("/getannouncements", getAnnouncements);
 router.get("/getcompletedint", getCompletedInternships);
+router.get("/getintpositions", getAvailableInternships);
 
 // Logbook
 router.post("/createlog", createLogEntry);
@@ -99,6 +104,9 @@ router.post("/addannouncement", addAnnouncement);
 router.post("/editannouncement", editAnnouncement);
 router.post("/deleteannouncement", deleteAnnouncement);
 router.get("/getstd", getStudents);
+router.post("/addintpostion", addInternshipPosition);
+router.post("/editintposition", editInternshipPosition);
+router.post("/deleteintposition", deleteInternshipPosition);
 
 //compsup routes
 
