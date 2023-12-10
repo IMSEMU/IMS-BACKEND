@@ -63,6 +63,13 @@ import {
   submitCompEval,
   submitConForm,
 } from "../controllers/compsup.controller.js";
+import {
+  addNewAdmin,
+  addNewDeptSup,
+  assignDeptSup,
+  getDeptSup,
+  getStudentstoAssign,
+} from "../controllers/admin.controller.js";
 
 const router = express.Router();
 
@@ -131,5 +138,12 @@ router.get("/getcompduedates", getCompDueDates);
 /* forgot password */
 router.post("/forgotpassword", ForgotPassword);
 router.post("/newPassword/:token", newPassword);
+
+//admin routes
+router.post("/addadmin", addNewAdmin);
+router.post("/adddeptsup", addNewDeptSup);
+router.get("/getstdtoassign", getStudentstoAssign);
+router.get("/getdeptsup", getDeptSup);
+router.post("/assigndept", assignDeptSup);
 
 export default router;

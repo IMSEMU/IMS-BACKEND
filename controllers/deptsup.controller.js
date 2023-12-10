@@ -954,7 +954,6 @@ export const submitDeptEval = async (req, res) => {
         if (previousInternships.length === 1) {
           await Internshipdtl.create({
             stdid: stdid,
-            dept_sup: "1",
           });
         }
       }
@@ -967,7 +966,6 @@ export const submitDeptEval = async (req, res) => {
       });
       await Internshipdtl.create({
         stdid: stdid,
-        dept_sup: "1",
       });
     }
 

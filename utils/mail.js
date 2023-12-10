@@ -64,4 +64,11 @@ export class Email {
   async sendSatisfactoryInternship() {
     await this.send("satisfactory", "Your Internship was Evaluated");
   }
+  async sendNewAdmin() {
+    await this.send("newAdmin", "Your EMU IMS Account");
+  }
+
+  async sendNewDeptSup() {
+    await this.send("newDeptSup", "Your EMU IMS Account");
+  }
 }

@@ -255,7 +255,6 @@ export const getCompletedInternships = async (req, res) => {
 
     const companies = [];
     for (const internship of completedinternships) {
-      console.log(internship);
       const company = await Company.findOne({
         where: { companyid: internship.compid },
       });
