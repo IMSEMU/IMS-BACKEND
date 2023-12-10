@@ -9,6 +9,7 @@ import Users from "../models/user.model.js";
 import Notifications from "../models/notification.model.js";
 import Log from "../models/log.model.js";
 import DeptSup from "../models/deptsup.model.js";
+import DueDates from "../models/duedates.model.js";
 
 export const compGetStudents = async (req, res) => {
   try {
@@ -487,6 +488,71 @@ export const getToDo = async (req, res) => {
       },
     });
     res.status(200).json(intdtl);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ msg: "Internal server error" });
+  }
+};
+
+export const getCompDueDates = async (req, res) => {
+  try {
+    // Check if user is logged in
+    const refreshToken = req.cookies.refreshToken;
+    if (!refreshToken) {
+      return res.status(401).json({ msg: "Unauthorized" });
+    }
+
+    // Verify refresh token and get user ID
+    const { userid } = await verifyToken(refreshToken);
+    if (!userid) {
+      return res.status(401).json({ msg: "Unauthorized" });
+    }
+
+    const compsup = await CompSup.findOne({
+      where: {
+        userid: userid,
+      },
+    });
+
+    const intdtl = await Internshipdtl.findAll({
+      where: {
+        comp_sup: compsup.supid,
+        overallresult: null,
+      },
+    });
+
+    let deptsups = [];
+    let duedates = [];
+    for (const internship of intdtl) {
+      const intdetails = await Internshipdtl.findOne({
+        where: { internshipid: internship.internshipid },
+      });
+
+      if (intdetails.dept_sup && !deptsups.includes(intdetails.dept_sup)) {
+        const ddates = await DueDates.findAll({
+          where: {
+            [Op.or]: [
+              {
+                name: "Internship Confirmation Form",
+              },
+              {
+                name: "Logbook",
+              },
+              {
+                name: "Company Evaluation Form",
+              },
+            ],
+            supid: intdetails.dept_sup,
+          },
+        });
+        deptsups.push(intdetails.dept_sup);
+
+        for (const date of ddates) {
+          duedates.push(date);
+        }
+      }
+    }
+    res.status(200).json(duedates);
   } catch (error) {
     console.error(error);
     res.status(500).json({ msg: "Internal server error" });

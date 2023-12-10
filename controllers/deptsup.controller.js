@@ -16,6 +16,7 @@ import Log from "../models/log.model.js";
 import Announcements from "../models/announcement.model.js";
 import CompletedInternships from "../models/completedinternships.model.js";
 import IntPositions from "../models/intpositions.model.js";
+import DueDates from "../models/duedates.model.js";
 
 export const getStudents = async (req, res) => {
   try {
@@ -1236,6 +1237,193 @@ export const deleteInternshipPosition = async (req, res) => {
     } else {
       return res.status(401).json({ msg: "Unauthorized" });
     }
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ msg: "Internal server error" });
+  }
+};
+
+export const editDueDates = async (req, res) => {
+  const { iaf, conform, sif, logbook, compeval, report } = req.body;
+  try {
+    // Check if user is logged in
+    const refreshToken = req.cookies.refreshToken;
+    if (!refreshToken) {
+      return res.status(401).json({ msg: "Unauthorized" });
+    }
+
+    // Verify refresh token and get user ID
+    const { userid } = await verifyToken(refreshToken);
+    if (!userid) {
+      return res.status(401).json({ msg: "Unauthorized" });
+    }
+
+    const deptsup = await DeptSup.findOne({
+      where: {
+        userid: userid,
+      },
+    });
+
+    if (iaf != "") {
+      const findIaf = await DueDates.findOne({
+        where: { name: "Internship Application Form", supid: deptsup.supid },
+      });
+
+      if (findIaf) {
+        await DueDates.update(
+          {
+            date: iaf,
+          },
+          { where: { formid: findIaf.formid } }
+        );
+      } else {
+        await DueDates.create({
+          name: "Internship Application Form",
+          date: iaf,
+          supid: deptsup.supid,
+        });
+      }
+    }
+    if (conform != "") {
+      const findConform = await DueDates.findOne({
+        where: { name: "Internship Confirmation Form", supid: deptsup.supid },
+      });
+
+      if (findConform) {
+        await DueDates.update(
+          {
+            date: conform,
+          },
+          { where: { formid: findConform.formid } }
+        );
+      } else {
+        await DueDates.create({
+          name: "Internship Confirmation Form",
+          date: conform,
+          supid: deptsup.supid,
+        });
+      }
+    }
+
+    if (sif != "") {
+      const findSif = await DueDates.findOne({
+        where: { name: "Social Insurance Form", supid: deptsup.supid },
+      });
+
+      if (findSif) {
+        await DueDates.update(
+          {
+            date: sif,
+          },
+          { where: { formid: findSif.formid } }
+        );
+      } else {
+        await DueDates.create({
+          name: "Social Insurance Form",
+          date: sif,
+          supid: deptsup.supid,
+        });
+      }
+    }
+    if (logbook != "") {
+      const findLogbook = await DueDates.findOne({
+        where: { name: "Logbook", supid: deptsup.supid },
+      });
+
+      if (findLogbook) {
+        await DueDates.update(
+          {
+            date: logbook,
+          },
+          { where: { formid: findLogbook.formid } }
+        );
+      } else {
+        await DueDates.create({
+          name: "Logbook",
+          date: logbook,
+          supid: deptsup.supid,
+        });
+      }
+    }
+
+    if (compeval != "") {
+      const findCompEval = await DueDates.findOne({
+        where: { name: "Company Evaluation Form", supid: deptsup.supid },
+      });
+
+      if (findCompEval) {
+        await DueDates.update(
+          {
+            date: compeval,
+          },
+          { where: { formid: findCompEval.formid } }
+        );
+      } else {
+        await DueDates.create({
+          name: "Company Evaluation Form",
+          date: compeval,
+          supid: deptsup.supid,
+        });
+      }
+    }
+
+    if (report != "") {
+      const findReport = await DueDates.findOne({
+        where: { name: "Report", supid: deptsup.supid },
+      });
+
+      if (findReport) {
+        await DueDates.update(
+          {
+            date: report,
+          },
+          { where: { formid: findReport.formid } }
+        );
+      } else {
+        await DueDates.create({
+          name: "Report",
+          date: report,
+          supid: deptsup.supid,
+        });
+      }
+    }
+
+    const duedates = await DueDates.findAll({
+      where: { supid: deptsup.supid },
+    });
+
+    res.status(200).json(duedates);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ msg: "Internal server error" });
+  }
+};
+
+export const getDeptDueDates = async (req, res) => {
+  try {
+    // Check if user is logged in
+    const refreshToken = req.cookies.refreshToken;
+    if (!refreshToken) {
+      return res.status(401).json({ msg: "Unauthorized" });
+    }
+
+    // Verify refresh token and get user ID
+    const { userid } = await verifyToken(refreshToken);
+    if (!userid) {
+      return res.status(401).json({ msg: "Unauthorized" });
+    }
+
+    const deptsup = await DeptSup.findOne({
+      where: {
+        userid: userid,
+      },
+    });
+
+    const duedates = await DueDates.findAll({
+      where: { supid: deptsup.supid },
+    });
+
+    res.status(200).json(duedates);
   } catch (error) {
     console.error(error);
     res.status(500).json({ msg: "Internal server error" });

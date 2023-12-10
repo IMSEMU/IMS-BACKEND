@@ -13,6 +13,7 @@ import {
 import {
   Register,
   getPhoto,
+  getStdDueDates,
   getStudent,
   saveReport,
 } from "../controllers/student.controller.js";
@@ -38,7 +39,9 @@ import {
   deleteAnnouncement,
   deleteInternshipPosition,
   editAnnouncement,
+  editDueDates,
   editInternshipPosition,
+  getDeptDueDates,
   getDeptLogbook,
   getInternship,
   getStudents,
@@ -51,6 +54,7 @@ import {
 import {
   approveLogbook,
   compGetStudents,
+  getCompDueDates,
   getLogbook,
   getStudentCompany,
   getToDo,
@@ -83,6 +87,7 @@ router.post("/createapp", createApplication);
 router.post("/submitins", submitInsurance);
 router.get("/getphoto", getPhoto);
 router.post("/savereport", saveReport);
+router.get("/getstdduedates", getStdDueDates);
 
 //company routes
 router.get("/getcomps", getCompanies);
@@ -107,6 +112,8 @@ router.get("/getstd", getStudents);
 router.post("/addintpostion", addInternshipPosition);
 router.post("/editintposition", editInternshipPosition);
 router.post("/deleteintposition", deleteInternshipPosition);
+router.post("/editduedates", editDueDates);
+router.get("/getdeptduedates", getDeptDueDates);
 
 //compsup routes
 
@@ -119,6 +126,7 @@ router.post("/rejectlog", rejectLogbook);
 router.post("/submitcompeval", submitCompEval);
 router.get("/gettodos", getToDo);
 router.get("/compgetstd", compGetStudents);
+router.get("/getcompduedates", getCompDueDates);
 
 /* forgot password */
 router.post("/forgotpassword", ForgotPassword);
