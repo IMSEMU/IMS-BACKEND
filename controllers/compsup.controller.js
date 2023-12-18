@@ -487,7 +487,32 @@ export const getToDo = async (req, res) => {
         comp_sup: compsup.supid,
       },
     });
-    res.status(200).json(intdtl);
+
+    const todos = [];
+    for (const internship of intdtl) {
+      const student = await Students.findOne({
+        where: { stdid: internship.stdid },
+      });
+
+      const stduser = await Users.findOne({
+        where: { userid: student.userId },
+        attributes: ["firstname", "lastname", "email"],
+      });
+
+      todos.push({
+        photo: student.photo,
+        internshipid: internship.internshipid,
+        stdid: student.stdid,
+        firstname: stduser.firstname,
+        lastname: stduser.lastname,
+        iafConfirmed: internship.iafConfirmed,
+        filledConForm: internship.filledConForm,
+        logComplete: internship.logComplete,
+        logConfirmed: internship.logConfirmed,
+        compEvalFilled: internship.compEvalFilled,
+      });
+    }
+    res.status(200).json(todos);
   } catch (error) {
     console.error(error);
     res.status(500).json({ msg: "Internal server error" });

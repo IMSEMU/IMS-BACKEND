@@ -70,6 +70,18 @@ import {
   getDeptSup,
   getStudentstoAssign,
 } from "../controllers/admin.controller.js";
+import {
+  addComment,
+  addPost,
+  bookmarkPost,
+  deleteBookmark,
+  deleteComment,
+  deletePost,
+  getBookmarks,
+  getFeed,
+  likePost,
+  unlikePost,
+} from "../controllers/posts.controller.js";
 
 const router = express.Router();
 
@@ -95,6 +107,18 @@ router.post("/submitins", submitInsurance);
 router.get("/getphoto", getPhoto);
 router.post("/savereport", saveReport);
 router.get("/getstdduedates", getStdDueDates);
+
+//post routes
+router.post("/addpost", addPost);
+router.get("/getfeed", getFeed);
+router.post("/addcomment", addComment);
+router.post("/likepost", likePost);
+router.post("/unlikepost", unlikePost);
+router.post("/deletepost", deletePost);
+router.post("/deletecomment", deleteComment);
+router.post("/bookmarkpost", bookmarkPost);
+router.post("/deletebookmark", deleteBookmark);
+router.get("/getbookmarks", getBookmarks);
 
 //company routes
 router.get("/getcomps", getCompanies);

@@ -1,11 +1,11 @@
-import { Sequelize } from 'sequelize';
-import db from '../config/db.config.js';
-import Students from './student.model.js';
+import { Sequelize } from "sequelize";
+import db from "../config/db.config.js";
+import Students from "./student.model.js";
 
 const { DataTypes } = Sequelize;
 
 const Posts = db.define(
-  'posts',
+  "posts",
   {
     postid: {
       type: DataTypes.INTEGER,
@@ -13,21 +13,21 @@ const Posts = db.define(
       primaryKey: true,
     },
     text: {
-        type: DataTypes.STRING,
-        allowNull: false,
-      },
-      media: {
-        type: DataTypes.STRING,
-      },
-      commentsCount: {
-        type: DataTypes.INTEGER,
-        defaultValue: 0,
-      },
-      likesCount: {
-        type: DataTypes.INTEGER,
-        defaultValue: 0,
-      },
+      type: DataTypes.TEXT,
+      allowNull: false,
     },
+    media: {
+      type: DataTypes.STRING,
+    },
+    commentsCount: {
+      type: DataTypes.INTEGER,
+      defaultValue: 0,
+    },
+    likesCount: {
+      type: DataTypes.INTEGER,
+      defaultValue: 0,
+    },
+  },
   {
     freezeTableName: true,
   }
@@ -38,8 +38,7 @@ const Posts = db.define(
 })();
 
 Posts.belongsTo(Students, {
-  foreignKey: 'stdid',
+  foreignKey: "stdid",
 });
-
 
 export default Posts;

@@ -1,12 +1,12 @@
-import { Sequelize } from 'sequelize';
-import db from '../config/db.config.js';
-import Students from './student.model.js';
-import Posts from './post.model.js';
+import { Sequelize } from "sequelize";
+import db from "../config/db.config.js";
+import Students from "./student.model.js";
+import Posts from "./post.model.js";
 
 const { DataTypes } = Sequelize;
 
 const Comments = db.define(
-  'comments',
+  "comments",
   {
     commentid: {
       type: DataTypes.INTEGER,
@@ -14,13 +14,13 @@ const Comments = db.define(
       primaryKey: true,
     },
     text: {
-        type: DataTypes.STRING,
-        allowNull: false,
-      },
+      type: DataTypes.TEXT,
+      allowNull: false,
+    },
     media: {
-        type: DataTypes.STRING,
+      type: DataTypes.STRING,
     },
-    },
+  },
   {
     freezeTableName: true,
   }
@@ -31,11 +31,10 @@ const Comments = db.define(
 })();
 
 Comments.belongsTo(Posts, {
-    foreignKey: 'postid',
-  });
+  foreignKey: "postid",
+});
 Comments.belongsTo(Students, {
-      foreignKey: 'stdid',
-    });
-
+  foreignKey: "stdid",
+});
 
 export default Comments;

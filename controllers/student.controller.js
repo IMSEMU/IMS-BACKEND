@@ -6,6 +6,7 @@ import Internshipdtl from "../models/intdetails.model.js";
 import Company from "../models/company.model.js";
 import Notifications from "../models/notification.model.js";
 import DueDates from "../models/duedates.model.js";
+import CompSup from "../models/compsup.model.js";
 
 export const Register = async (req, res) => {
   const { stdid, firstname, lastname, email, password, confPassword } =
@@ -84,28 +85,52 @@ export const getStudent = async (req, res) => {
     const compsup = await CompSup.findOne({
       where: { supid: intdtl.comp_sup },
     });
-    const company = await Company.findOne({
-      where: { companyid: compsup.companyid },
-    });
-    const student = {
-      userid: std.userId,
-      stdid: std.stdid,
-      phoneno: std.phoneno,
-      address: std.address,
-      country: company.country,
-      startdate: intdtl.startDate,
-      enddate: intdtl.endDate,
-      duration: intdtl.workingDays,
-      filled_iaf: intdtl.filled_iaf,
-      iafConfirmed: intdtl.iafConfirmed,
-      filledConForm: intdtl.filledConForm,
-      conFormConfirmed: intdtl.conFormConfirmed,
-      filledSocial: intdtl.filledSocial,
-      sifConfirmed: intdtl.sifConfirmed,
-      logComplete: intdtl.logComplete,
-      logConfirmed: intdtl.logConfirmed,
-      reportComplete: intdtl.reportComplete,
-    };
+
+    let student;
+    if (compsup) {
+      const company = await Company.findOne({
+        where: { companyid: compsup.companyid },
+      });
+
+      student = {
+        userid: std.userId,
+        stdid: std.stdid,
+        phoneno: std.phoneno,
+        address: std.address,
+        country: company.country,
+        startdate: intdtl.startDate,
+        enddate: intdtl.endDate,
+        duration: intdtl.workingDays,
+        filled_iaf: intdtl.filled_iaf,
+        iafConfirmed: intdtl.iafConfirmed,
+        filledConForm: intdtl.filledConForm,
+        conFormConfirmed: intdtl.conFormConfirmed,
+        filledSocial: intdtl.filledSocial,
+        sifConfirmed: intdtl.sifConfirmed,
+        logComplete: intdtl.logComplete,
+        logConfirmed: intdtl.logConfirmed,
+        reportComplete: intdtl.reportComplete,
+      };
+    } else {
+      student = {
+        userid: std.userId,
+        stdid: std.stdid,
+        phoneno: std.phoneno,
+        address: std.address,
+        startdate: intdtl.startDate,
+        enddate: intdtl.endDate,
+        duration: intdtl.workingDays,
+        filled_iaf: intdtl.filled_iaf,
+        iafConfirmed: intdtl.iafConfirmed,
+        filledConForm: intdtl.filledConForm,
+        conFormConfirmed: intdtl.conFormConfirmed,
+        filledSocial: intdtl.filledSocial,
+        sifConfirmed: intdtl.sifConfirmed,
+        logComplete: intdtl.logComplete,
+        logConfirmed: intdtl.logConfirmed,
+        reportComplete: intdtl.reportComplete,
+      };
+    }
 
     res.status(200).json(student);
   } catch (error) {
