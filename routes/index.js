@@ -21,6 +21,8 @@ import {
 import { refreshToken } from "../controllers/RefreshToken.js";
 import {
   createLogEntry,
+  deleteLog,
+  editLog,
   getEntries,
   submitLogbook,
 } from "../controllers/log.controller.js";
@@ -98,6 +100,8 @@ router.get("/getintpositions", getAvailableInternships);
 router.post("/createlog", createLogEntry);
 router.get("/viewlog", getEntries);
 router.post("/submitlog", submitLogbook);
+router.post("/deletelog", deleteLog);
+router.post("/editlog", editLog);
 
 //student routes
 router.post("/register", Register);

@@ -256,6 +256,7 @@ export const getLogbook = async (req, res) => {
     const internship = await Internshipdtl.findOne({
       where: {
         logComplete: true,
+        overallresult: null,
         stdid: stdid,
         comp_sup: compsup.supid,
       },
@@ -356,6 +357,7 @@ export const rejectLogbook = async (req, res) => {
     const internship = await Internshipdtl.findOne({
       where: {
         logComplete: true,
+        overallresult: null,
         stdid: stdid,
         comp_sup: compsup.supid,
       },
