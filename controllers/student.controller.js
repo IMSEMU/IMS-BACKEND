@@ -14,16 +14,12 @@ export const Register = async (req, res) => {
 
   // Check if password is missing or undefined
   if (!password) {
-    return res
-      .status(400)
-      .json({ msg: "Password is required", requestBody: req.body });
+    return res.status(400).json({ msg: "1", requestBody: req.body }); //Password is required
   }
 
   // Check if password and confirm password match
   if (password !== confPassword) {
-    return res
-      .status(400)
-      .json({ msg: "Password and Confirm Password do not match" });
+    return res.status(400).json({ msg: "2" }); //Password and Confirm Password do not match
   }
 
   const saltRounds = 10;
@@ -33,7 +29,7 @@ export const Register = async (req, res) => {
     const existingUser = await Users.findOne({ where: { email: email } });
 
     if (existingUser) {
-      return res.status(400).json({ msg: "Email already exists" });
+      return res.status(400).json({ msg: "3" }); //Email already exists
     }
 
     const salt = await bcrypt.genSalt(saltRounds);
@@ -58,7 +54,7 @@ export const Register = async (req, res) => {
     return res.json({ msg: "Registration Successful" });
   } catch (error) {
     console.error(error); // Log the error for debugging purposes
-    return res.status(500).json({ msg: "Registration Error" });
+    return res.status(500).json({ msg: "4" }); //Registration Error
   }
 };
 

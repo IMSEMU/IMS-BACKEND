@@ -11,17 +11,6 @@ import CompletedInternships from "../models/completedinternships.model.js";
 import Company from "../models/company.model.js";
 import IntPositions from "../models/intpositions.model.js";
 
-export const getUsers = async (req, res) => {
-  try {
-    const users = await Users.findAll({
-      // attributes: ['id', 'name', 'email'],
-    });
-    res.json(users);
-  } catch (error) {
-    console.log(error);
-  }
-};
-
 const generateTokens = (userid, firstname, lastname, email, userrole) => {
   const accessToken = jwt.sign(
     { userid, firstname, lastname, email, userrole },
@@ -90,13 +79,13 @@ export const Login = async (req, res) => {
     });
 
     if (!user) {
-      return res.status(400).json({ msg: "Invalid Credentials" });
+      return res.status(400).json({ msg: "1" }); //Invalid Credentials
     }
 
     const isPasswordValid = await bcrypt.compare(password, user.password);
 
     if (!isPasswordValid) {
-      return res.status(400).json({ msg: "Wrong Password" });
+      return res.status(400).json({ msg: "2" }); //Wrong Password
     }
 
     const processedUser = await processUser(user);
@@ -108,7 +97,7 @@ export const Login = async (req, res) => {
     return res.status(200).json({ status: "success", ...processedUser });
   } catch (error) {
     console.log(error);
-    res.status(500).json({ msg: "Login Exception Raised" });
+    res.status(500).json({ msg: "3" }); //Login Exception Raised
   }
 };
 

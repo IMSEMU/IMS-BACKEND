@@ -125,10 +125,6 @@ export const getSubmissions = async (req, res) => {
             sifConfirmed: false,
           },
           {
-            filledSocial: true,
-            sifConfirmed: false,
-          },
-          {
             logComplete: true,
             logConfirmed: false,
           },
