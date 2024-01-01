@@ -43,7 +43,6 @@ export const getStudents = async (req, res) => {
 
     const students = [];
     const check = [];
-    const internships = [];
     for (const internshipDetail of stdintdtl) {
       const student = await Students.findOne({
         where: { stdid: internshipDetail.stdid },
@@ -57,6 +56,7 @@ export const getStudents = async (req, res) => {
           where: { stdid: student.stdid, dept_sup: dept_sup.supid },
         });
 
+        const internships = [];
         for (const internshipdtl of allInternships) {
           const compsup = await CompSup.findOne({
             where: { supid: internshipdtl.comp_sup },
@@ -83,6 +83,8 @@ export const getStudents = async (req, res) => {
         check.push(student.stdid);
       }
     }
+
+    console.log(students);
 
     res.status(200).json(students);
   } catch (error) {
@@ -271,13 +273,13 @@ export const confirmApplication = async (req, res) => {
     // Check if user is logged in
     const refreshToken = req.cookies.refreshToken;
     if (!refreshToken) {
-      return res.status(401).json({ msg: "Unauthorized" });
+      return res.status(401).json({ msg: "1" }); //Unauthorized
     }
 
     // Verify refresh token and get user ID
     const { userid } = await verifyToken(refreshToken);
     if (!userid) {
-      return res.status(401).json({ msg: "Unauthorized" });
+      return res.status(401).json({ msg: "1" }); //Unauthorized
     }
 
     const deptsup = await DeptSup.findOne({
@@ -363,10 +365,9 @@ export const confirmApplication = async (req, res) => {
     });
 
     res.status(200).json({ msg: "Internship Confirmed" });
-    // res.status(200).json(intdtl);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ msg: "Internal server error" });
+    res.status(500).json({ msg: "2" }); //Internal Server Error
   }
 };
 
@@ -377,13 +378,13 @@ export const rejectApplication = async (req, res) => {
     // Check if user is logged in
     const refreshToken = req.cookies.refreshToken;
     if (!refreshToken) {
-      return res.status(401).json({ msg: "Unauthorized" });
+      return res.status(401).json({ msg: "1" }); //Unauthorized
     }
 
     // Verify refresh token and get user ID
     const { userid } = await verifyToken(refreshToken);
     if (!userid) {
-      return res.status(401).json({ msg: "Unauthorized" });
+      return res.status(401).json({ msg: "1" }); //Unauthorized
     }
 
     const deptsup = await DeptSup.findOne({
@@ -411,14 +412,8 @@ export const rejectApplication = async (req, res) => {
       },
     });
 
-    const compsup = await CompSup.findOne({
-      where: { supid: internship.compsup },
-    });
     const otherSupStudents = await Internshipdtl.findAll({
       where: { comp_sup: internship.comp_sup },
-    });
-    const otherCompStudents = await Internshipdtl.findAll({
-      where: { companyid: compsup.companyid },
     });
     await Internshipdtl.update(
       {
@@ -439,11 +434,6 @@ export const rejectApplication = async (req, res) => {
       await CompSup.destroy({
         where: { supid: std.comp_sup },
       });
-      if (otherCompStudents.length === 1) {
-        await Company.destroy({
-          where: { companyid: compsup.companyid },
-        });
-      }
     }
 
     await Notifications.create({
@@ -453,10 +443,9 @@ export const rejectApplication = async (req, res) => {
     });
 
     res.status(200).json({ msg: "Internship Rejected" });
-    // res.status(200).json(intdtl);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ msg: "Internal server error" });
+    res.status(500).json({ msg: "2" }); //Internal Server Error
   }
 };
 
@@ -564,7 +553,7 @@ export const rejectConfirmation = async (req, res) => {
     });
 
     const compsup = await CompSup.findOne({
-      where: { supid: internship.compsup },
+      where: { supid: internship.comp_sup },
     });
 
     await Internshipdtl.update(
@@ -573,6 +562,7 @@ export const rejectConfirmation = async (req, res) => {
         endDate: null,
         workingDays: null,
         filledConForm: false,
+        conForm: null,
       },
       {
         where: { internshipid: internship.internshipid },
@@ -1012,13 +1002,13 @@ export const editAnnouncement = async (req, res) => {
     // Check if user is logged in
     const refreshToken = req.cookies.refreshToken;
     if (!refreshToken) {
-      return res.status(401).json({ msg: "Unauthorized" });
+      return res.status(401).json({ msg: "1" }); //Unauthorized
     }
 
     // Verify refresh token and get user ID
     const { userid } = await verifyToken(refreshToken);
     if (!userid) {
-      return res.status(401).json({ msg: "Unauthorized" });
+      return res.status(401).json({ msg: "1" }); //Unauthorized
     }
 
     const deptsup = await DeptSup.findOne({
@@ -1041,11 +1031,11 @@ export const editAnnouncement = async (req, res) => {
       );
       res.status(200).json({ msg: "Announcement Edited Successfully!" });
     } else {
-      return res.status(401).json({ msg: "Unauthorized" });
+      return res.status(401).json({ msg: "1" }); //Unauthorized
     }
   } catch (error) {
     console.error(error);
-    res.status(500).json({ msg: "Internal server error" });
+    res.status(500).json({ msg: "2" }); //Internal server error
   }
 };
 
@@ -1055,13 +1045,13 @@ export const deleteAnnouncement = async (req, res) => {
     // Check if user is logged in
     const refreshToken = req.cookies.refreshToken;
     if (!refreshToken) {
-      return res.status(401).json({ msg: "Unauthorized" });
+      return res.status(401).json({ msg: "1" }); //Unauthorized
     }
 
     // Verify refresh token and get user ID
     const { userid } = await verifyToken(refreshToken);
     if (!userid) {
-      return res.status(401).json({ msg: "Unauthorized" });
+      return res.status(401).json({ msg: "1" }); //Unauthorized
     }
 
     const deptsup = await DeptSup.findOne({
@@ -1078,11 +1068,11 @@ export const deleteAnnouncement = async (req, res) => {
       await Announcements.destroy({ where: { announcementid: id } });
       res.status(200).json({ msg: "Announcement Deleted Successfully!" });
     } else {
-      return res.status(401).json({ msg: "Unauthorized" });
+      return res.status(401).json({ msg: "1" }); //Unauthorized
     }
   } catch (error) {
     console.error(error);
-    res.status(500).json({ msg: "Internal server error" });
+    res.status(500).json({ msg: "2" }); //Internal server Error
   }
 };
 

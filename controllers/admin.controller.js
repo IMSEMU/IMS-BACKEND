@@ -47,11 +47,11 @@ export const addNewAdmin = async (req, res) => {
 
       res.status(200).json(adminUser);
     } else {
-      res.status(500).json({ msg: "Admin User Already Exists" });
+      res.status(500).json({ msg: "1" }); //Admin User Already Exists
     }
   } catch (error) {
     console.error(error);
-    res.status(500).json({ msg: "Internal server error" });
+    res.status(500).json({ msg: "2" }); //Internal server error
   }
 };
 
@@ -103,11 +103,11 @@ export const addNewDeptSup = async (req, res) => {
 
       res.status(200).json(deptsup);
     } else {
-      res.status(500).json({ msg: "Department Supervisor Already Exists" });
+      res.status(500).json({ msg: "1" }); //Department Supervisor Already Exists
     }
   } catch (error) {
     console.error(error);
-    res.status(500).json({ msg: "Internal server error" });
+    res.status(500).json({ msg: "2" }); //Internal server error
   }
 };
 

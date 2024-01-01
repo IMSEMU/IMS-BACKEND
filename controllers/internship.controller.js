@@ -30,13 +30,13 @@ export const createApplication = async (req, res) => {
     // Check if user is logged in
     const refreshToken = req.cookies.refreshToken;
     if (!refreshToken) {
-      return res.status(401).json({ msg: "Unauthorized" });
+      return res.status(401).json({ msg: "1" }); //Unauthorized
     }
 
     // Verify refresh token and get user ID
     const { userid } = await verifyToken(refreshToken);
     if (!userid) {
-      return res.status(401).json({ msg: "Unauthorized" });
+      return res.status(401).json({ msg: "1" }); //Unauthorized
     }
 
     await Students.update(
@@ -99,7 +99,7 @@ export const createApplication = async (req, res) => {
     return res.json({ msg: "Application Successful" });
   } catch (error) {
     console.error(error); // Log the error for debugging purposes
-    return res.status(500).json({ msg: "Application Error" });
+    return res.status(500).json({ msg: "2" }); //Internal Server Error
   }
 };
 

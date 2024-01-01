@@ -106,6 +106,7 @@ export const getStudent = async (req, res) => {
         logComplete: intdtl.logComplete,
         logConfirmed: intdtl.logConfirmed,
         reportComplete: intdtl.reportComplete,
+        compEvalConfirmed: intdtl.compEvalConfirmed,
       };
     } else {
       student = {
