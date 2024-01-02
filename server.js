@@ -7,6 +7,7 @@ import router from "./routes/index.js";
 import db from "./config/db.config.js";
 import Roles from "./models/role.model.js";
 import WorkDone from "./models/workdone.model.js";
+import Users from "./models/user.model.js";
 
 dotenv.config();
 
@@ -43,6 +44,7 @@ db.sync({ force: false }).then(async () => {
   // Check if the "roles" table is empty
   const roleCount = await Roles.count();
   const workCount = await WorkDone.count();
+  const userCount = await Users.count();
 
   if (roleCount === 0) {
     // Insert default roles
@@ -81,6 +83,19 @@ db.sync({ force: false }).then(async () => {
     console.log('Default work inserted into the "workdone" table.');
   } else {
     console.log('no need for insert "workdone" table.');
+  }
+
+  if (userCount == 0) {
+    await Users.bulkCreate([
+      {
+        firstname: "admin",
+        lastname: "admin",
+        email: "admin@emu.edu.tr",
+        password:
+          "$2b$10$4iQTG5D6e94yW.6mllrbVu/rvUj4/qRMhE/SbnEAAWxgES6EAmt0S",
+        roleId: 4,
+      },
+    ]);
   }
 });
 
