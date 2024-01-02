@@ -6,6 +6,8 @@ Create a database called **IMS**, with user **admin** and password **IMSProject1
 
 Run the server:
 ```
+npm i
+
 npm run dev
 ```
 
