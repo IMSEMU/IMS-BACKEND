@@ -8,6 +8,6 @@ Run the server:
 ```
 npm i
 
-npm run dev
+npm start
 ```
 
